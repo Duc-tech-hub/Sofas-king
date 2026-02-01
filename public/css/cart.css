@@ -1,0 +1,80 @@
+:root {
+    --auth-blur: 40px;
+    --auth-opacity: 0;
+    --auth-pointer: none;
+}
+
+html,
+body {
+    filter: blur(var(--auth-blur)) !important;
+    opacity: var(--auth-opacity) !important;
+    pointer-events: var(--auth-pointer) !important;
+    transition: all 0.5s ease;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+body {
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+/* Container chứa danh sách sản phẩm */
+.container {
+    background-color: #F8F9FA;
+    border: 1px solid #E0E0E0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 0 auto 16px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#redirect {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 50px;
+    font-weight: bold;
+
+    align-self: flex-end;
+    margin-top: 20px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+#redirect:hover {
+    background: linear-gradient(135deg, #0056b3, #004099);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    #redirect {
+        width: 100%;
+        align-self: center;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}

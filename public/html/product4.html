@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>product details</title>
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+  <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+  <link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/css/styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+  <a class="btn btn-secondary" href="home.html">
+    <i class="bi bi-chevron-left"></i>
+  </a>
+  <div class="product-detail">
+    <img class="img-box" src="/image/imagep4.jpg" alt="Products: Champagne Elegance">
+    <div class="product-info">
+      <h1>Champagne Elegance</h1>
+      <p>Soft champagne hues create an inviting and refined atmosphere. Designed for versatility, it complements a wide
+        range of decors.</p>
+      <p class="text">4.800.000đ</p>
+      <h3 class="text">Choose a size for product:</h3>
+      <label>
+        <input type="radio" name="radio" id="sizescheckbox4">Size S</label><br>
+      <label>
+        <input type="radio" name="radio" id="sizemcheckbox4">Size M</label><br>
+      <label>
+        <input type="radio" name="radio" id="sizelcheckbox4">Size L</label><br>
+      <span class="error-checkbox" id="errorcheck4"></span>
+      <h3 class="text">Choose quantity of product:</h3>
+      <input type="number" min="1" value="1" max="10" id="number4"><br>
+      <div class="btn-group">
+        <button class="buy-btn" id="buttonbuy4">Buy Now</button>
+      </div><br>
+    </div>
+  </div>
+  <script type="module" src="/js/cart.js"></script>
+  <script type="module" src="/js/Security.js"></script>
+</body>
+
+</html>

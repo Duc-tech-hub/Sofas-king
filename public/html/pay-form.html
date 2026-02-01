@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="/css/pay-form.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <a class="btn btn-secondary" href="cart.html">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+
+    <div class="pay-container">
+        <h1>Payment</h1>
+
+        <button id="recheck">
+            <img src="/image/Logogoogle.jpg" alt="Verify via Google">
+            <p>Please verify that this is you!</p>
+        </button>
+
+        <div class="qr-wrapper">
+            <img id="qr-image"
+                src="https://img.vietqr.io/image/970415-99999999999999-compact.png?&addInfo=Please pay the orders and correct money.&accountName=King_sofas"
+                alt="QR-Code-Payment" class="qr-display">
+        </div>
+        <div class="address-group">
+            <h3 id="title-address" class="address-label">Enter your address to buy:</h3>
+            <input id="address" class="address-field" type="text" placeholder="Enter your address">
+            <div id="address-suggestions" class="suggestions-container"></div>
+        </div>
+        <span id="output_money">Total:</span><br>
+
+        <div class="confirm-container">
+            <button id="confirmed-sent">
+                <i class="fas fa-check-circle"></i>
+                I have sent money.
+            </button>
+            <p class="note" id="note">Please wait until admin confirm...</p>
+        </div>
+    </div>
+    <script type="module" src="/js/API.js"></script>
+    <script type="module" src="/js/pay.js"></script>
+    <script type="module" src="/js/Security.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Control Panel</title>
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    <link rel="stylesheet" type="text/css" rel="noopener" target="_blank" href="/css/Adminpanel.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <a class="btn btn-secondary backbtn" href="home.html">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+    <h1>Welcome to Admin Control Panel</h1>
+    <div class="Sections">
+        <div class="manage">
+            <h3>Manage accounts</h3>
+            <form id="form-account"><input type="text" placeholder="🔍 Search here..." class="input"
+                    id="search-account"></form>
+            <button class="button" id="select-account">Select</button>
+            <button class="button-hide btn-complete" id="enable-account">Unlock</button>
+            <button class="button-hide btn-delete" id="disable-account">Lock</button>
+        </div>
+        <div class="output" id="output-box-accouts"></div>
+    </div>
+    <div class="Sections">
+        <div class="manage">
+            <h3>Manage comments</h3>
+            <input type="text" placeholder="🔍 Search here..." class="input" id="search-comment">
+            <button class="button" id="select-comment">Select</button>
+            <button class="button-hide btn-delete" id="remove-comment">Remove</button>
+        </div>
+        <div class="output" id="output-box-comments"></div>
+    </div>
+    <div class="Sections">
+        <div class="manage">
+            <h3>Manage orders</h3>
+            <button class="button" id="select-order">Select</button>
+            <button class="button-hide btn-complete" id="accept-order" style="display: none;">Accept</button>
+            <button class="button-hide btn-delete" id="deny-order" style="display: none;">Deny</button>
+        </div>
+        <div class="output" id="output-box-orders"></div>
+    </div>
+    <section class="admin-shipping-wrapper">
+        <div class="shipping-header">
+            <div class="header-left">
+                <h2>Shipping & Delivery Management</h2>
+                <div class="shipping-controls">
+                    <button class="button" id="select-shipping">Select</button>
+                    <button class="button-hide btn-complete" id="complete-shipping">Complete Selected</button>
+                    <button class="button-hide btn-delete" id="delete-shipping">Remove Selected</button>
+                </div>
+            </div>
+
+            <div class="shipping-stats">
+                <div class="stat-card">
+                    <span class="stat-label">TOTAL ORDERS</span>
+                    <span id="total-orders-count" class="stat-value">0</span>
+                </div>
+                <div class="stat-card pending">
+                    <span class="stat-label">PENDING DELIVERY</span>
+                    <span id="pending-delivery-count" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="shipping-container" class="shipping-grid">
+            <div class="loading-state">
+                <p>Loading global orders...</p>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="/js/Security.js"></script>
+    <script type="module" src="/js/Adminpanel-part1.js"></script>
+    <script type="module" src="/js/Adminpanel-part2.js"></script>
+    <script type="module" src="/js/Adminpanel-part3.js"></script>
+    <script type="module" src="/js/Adminpanel-part4.js"></script>
+</body>
+
+</html>

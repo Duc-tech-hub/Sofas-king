@@ -1,0 +1,139 @@
+
+
+.returnb img {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  z-index: 1000;
+}
+
+.form {
+  margin-top: 80px;
+}
+
+.searchbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: fit-content;
+  gap: 10px;
+  padding: 0 20px;
+}
+
+.text1 {
+  display: block;
+  width: fit-content;
+  margin: 20px auto;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-size: 1.2rem;
+}
+
+.input {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  width: 100%;
+  max-width: 400px;
+  height: 45px;
+  border: 2px solid black;
+  border-radius: 8px;
+  padding: 0 15px;
+}
+
+.submitbutton {
+  all: unset;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.submitbutton:hover {
+  opacity: 0.8;
+}
+
+.submitbutton img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.product {
+  margin: 50px auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  justify-items: center;
+}
+
+.product1 {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.product1:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  display: block;
+  margin: 10px auto;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  color: #333;
+}
+
+.hideimg {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .product {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 30px 20px;
+  }
+
+  .product1 {
+    background-color: #fdfcf0;
+    border: 1px solid #d2b48c;
+  }
+}
+
+@media (max-width: 600px) {
+  .product {
+    grid-template-columns: 1fr;
+    margin: 20px 10px;
+    gap: 20px;
+  }
+
+  .input {
+    width: 200px;
+  }
+
+  .product1 {
+    max-width: 100%;
+  }
+
+  .image {
+    height: 250px;
+  }
+}

@@ -1,0 +1,113 @@
+
+
+body {
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.button {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    color: #555;
+    border-radius: 12px;
+    padding: 10px 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.infocontainer {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+.infocontainer h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1a73e8;
+    margin-bottom: 30px;
+}
+
+.infocontainer h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #5f6368;
+    text-transform: uppercase;
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    padding-left: 5px;
+}
+
+.inputinfo {
+    display: block;
+    background: #f8f9fa;
+    color: #202124;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 1.5px solid #e8eaed;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: left;
+    transition: border-color 0.3s;
+}
+
+.inputinfo:hover {
+    border-color: #1a73e8;
+}
+
+span:not(.inputinfo) {
+    display: block;
+    text-align: left;
+    color: #70757a;
+    font-size: 0.9rem;
+    padding-left: 5px;
+    margin-top: 4px;
+}
+
+.Button#logoutbutton {
+    width: 100%;
+    margin-top: 40px;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3);
+    transition: all 0.3s ease;
+}
+
+.Button#logoutbutton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 65, 108, 0.4);
+    filter: brightness(1.1);
+}
+
+.Button#logoutbutton:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .inputinfo {
+        padding: 14px 10px;
+    }
+}
