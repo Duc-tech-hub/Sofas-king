@@ -1,8 +1,7 @@
 import { auth, db } from "./firebase-config.js";
-import { getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 const googleProvider = new GoogleAuthProvider();
-
 document.addEventListener("DOMContentLoaded", () => {
     const googleMethodButton = document.querySelector("#googlemethod");
     const Search = document.querySelector("#formsearch");
@@ -30,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                         await setDoc(doc(db, "users", user.uid), {
                             email: user.email,
-                            lastLogin: new Date().toLocaleString('vi-VN')
+                            lastLogin: serverTimestamp()
                         }, { merge: true });
 
                         window.location.href = "../html/home.html";
