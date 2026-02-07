@@ -146,7 +146,6 @@ service cloud.firestore {
       return request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.is_disabled != true;
     }
-
     match /all_orders/{orderId} {
       allow read: if request.auth != null && (isAdmin() || (request.auth.token.email == resource.data.customerEmail && isNotDisabled()));
       allow create: if isNotDisabled(); 
@@ -156,18 +155,17 @@ service cloud.firestore {
     match /users/{userId} {
       allow read, write: if isAdmin();
       allow get: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null;
+      allow create: if request.auth != null; 
     }
 
     match /comments/{commentId} {
-      allow read: if true;
+      allow read: if isNotDisabled(); 
       allow create: if isNotDisabled();
       allow delete: if isAdmin();
     }
 
     match /history/{email} {
       allow read, write: if isAdmin();
-      
       match /{allSubcollections=**} {
         allow read: if request.auth != null && (isAdmin() || (request.auth.token.email == email && isNotDisabled()));
         allow write: if isAdmin();
@@ -192,5 +190,6 @@ service cloud.firestore {
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
