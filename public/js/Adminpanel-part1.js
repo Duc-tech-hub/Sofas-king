@@ -3,7 +3,7 @@ import {
     collection,
     onSnapshot,
     doc,
-    updateDoc
+    updateDoc,
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 let isSelectMode = false;
@@ -55,7 +55,17 @@ const loadUsersToBox = () => {
                 statusEl.textContent = "🚫 Account Disabled";
                 statusEl.style.color = "red";
             } else {
-                statusEl.textContent = `Last login: ${user.lastLogin || "Never"}`;
+                let displayTime = "Never";
+
+                if (user.lastLogin) {
+                    if (typeof user.lastLogin.toDate === 'function') {
+                        displayTime = user.lastLogin.toDate().toLocaleString('vi-VN');
+                    } else {
+                        displayTime = user.lastLogin;
+                    }
+                }
+
+                statusEl.textContent = `Last login: ${displayTime}`;
                 statusEl.style.color = "#666";
             }
 
