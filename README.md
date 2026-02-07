@@ -149,7 +149,7 @@ service cloud.firestore {
 
     match /all_orders/{orderId} {
       allow read: if request.auth != null && (isAdmin() || (request.auth.token.email == resource.data.customerEmail && isNotDisabled()));
-      allow create: if request.auth != null && isNotDisabled();
+      allow create: if isNotDisabled(); 
       allow update, delete: if isAdmin();
     }
 
@@ -161,7 +161,7 @@ service cloud.firestore {
 
     match /comments/{commentId} {
       allow read: if true;
-      allow create: if request.auth != null && isNotDisabled();
+      allow create: if isNotDisabled();
       allow delete: if isAdmin();
     }
 
@@ -173,6 +173,7 @@ service cloud.firestore {
         allow write: if isAdmin();
       }
     }
+    
     match /{path=**}/admin_verify/{statusDoc} { allow read: if isAdmin(); }
     match /{path=**}/pending_orders/{orderDoc} { allow read: if isAdmin(); }
   }
@@ -191,4 +192,5 @@ service cloud.firestore {
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
