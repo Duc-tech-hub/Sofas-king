@@ -161,7 +161,6 @@ service cloud.firestore {
 
     match /comments/{commentId} {
       allow read: if true;
-      // Chỉ cho phép người dùng KHÔNG bị ban được comment
       allow create: if request.auth != null && isNotDisabled();
       allow delete: if isAdmin();
     }
@@ -192,3 +191,4 @@ service cloud.firestore {
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
