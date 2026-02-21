@@ -196,7 +196,6 @@ Sofa King has been vetted and recognized by established members of the global de
 
 * **Technical Validation:** The project's modular architecture, Firebase Security Rules, and real-time synchronization logic have been recognized as high-quality implementations by senior peers in the industry.
 
-* **Global Reach:** Despite being developed by a 14-year-old student, the platform's engineering standards have attracted attention from international developers, proving that age is no barrier to technical excellence.
-
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
