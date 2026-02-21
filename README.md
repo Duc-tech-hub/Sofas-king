@@ -107,7 +107,7 @@ While Firestore offers onSnapshot, using it everywhere is expensive and can lead
 
 #### 3. Customer-Centric Data Persistence
 I implemented a logic where the purchase record is committed to the database the moment a transaction occurs. My reasoning is that a purchase is a finalized action from the user's perspective; therefore, it should be reflected in their "Buying History" immediately, regardless of the delivery status. The Admin Panel then acts as a secondary layer to verify and update these existing records, ensuring transparency and trust between the buyer and the seller.
-###### 📖 Read the full technical breakdown and architecture deep-dive on https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebasej-at-age-14-3mbd
+###### 📖 Read the full technical breakdown and architecture deep-dive on https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebase-at-age-14-3mbd
 ---
 
  ## Project Structure
@@ -190,6 +190,7 @@ service cloud.firestore {
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
 
