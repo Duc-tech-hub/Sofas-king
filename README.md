@@ -1,6 +1,6 @@
-﻿ # 🛋️ Sofa King - Premium E-Commerce Solution
+﻿ # 🛋️ Sofas King - Premium E-Commerce Solution
 
-I developed Sofa Luxe as a high-performance, full-stack e-commerce platform featuring a modular architecture of **70 files**. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
+I developed Sofas king as a high-performance, full-stack e-commerce platform featuring a modular architecture of **70 files**. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
 
 ---
 
@@ -22,7 +22,7 @@ I developed Sofa Luxe as a high-performance, full-stack e-commerce platform feat
   
 ## Social Good & Community Impact
 
-Behind the code of Sofa King is a vision to empower small businesses and promote sustainable commerce practices:
+Behind the code of Sofas King is a vision to empower small businesses and promote sustainable commerce practices:
 
 * **Supporting Local Artisans:** I designed this platform to be lightweight and easy to deploy, specifically aiming to help local furniture makers who lack the technical resources to transition from traditional markets to a professional digital storefront.
 
@@ -96,7 +96,7 @@ graph TD
         I -->|Delete Comments| H
     end
 
-### 🧠 Technical Deep Dive: The Engineering Behind Sofa King
+### 🧠 Technical Deep Dive: The Engineering Behind Sofas King
 Building a production-ready platform as a solo developer required more than just coding; it required architectural foresight. Here is how I solved the core engineering challenges:
 
 #### 1. Managing Complexity in a 70-File Modular System
@@ -190,7 +190,7 @@ service cloud.firestore {
 
 ## 🌟 Community Recognition & Expert Endorsement
 
-Sofa King has been vetted and recognized by established members of the global developer community.
+Sofas King has been vetted and recognized by established members of the global developer community.
 
 * **Expert Star & Follow:** This repository was officially starred, and the author followed, by Sandeep Vashishtha, a professional Full-Stack Developer and active Open-Source Contributor with over 200+ successful Pull Requests.
 
@@ -198,4 +198,5 @@ Sofa King has been vetted and recognized by established members of the global de
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
