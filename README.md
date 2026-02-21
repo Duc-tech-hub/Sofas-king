@@ -1,6 +1,6 @@
 ﻿ # 🛋️ Sofa King - Premium E-Commerce Solution
 
-I developed Sofa Luxe as a high-performance, full-stack e-commerce platform featuring a modular architecture of **72+ files**. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
+I developed Sofa Luxe as a high-performance, full-stack e-commerce platform featuring a modular architecture of **70 files**. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
 
 ---
 
@@ -99,7 +99,7 @@ graph TD
 ### 🧠 Technical Deep Dive: The Engineering Behind Sofa King
 Building a production-ready platform as a solo developer required more than just coding; it required architectural foresight. Here is how I solved the core engineering challenges:
 
-#### 1. Managing Complexity in a 72-File Modular System
+#### 1. Managing Complexity in a 70-File Modular System
 Moving away from a monolithic structure, I adopted an ES6 Module-based architecture. Each functionality (Auth, Cart, Admin, Security) is isolated into its own module. * The Challenge: Ensuring customers receive instant updates on their order fulfillment status (e.g., "Pending" to "Delivered") across 25+ distinct HTML pages without requiring manual browser refreshes (F5). * I implemented an Event-Driven Real-time Synchronization pattern using Firestore onSnapshot as the single source of truth. By bypassing traditional polling, the system "pushes" status changes from the Admin Dashboard directly to the Client UI in real-time. I integrated this with LocalStorage to persist the active Order ID, ensuring that even if a user closes their browser, the live tracking session resumes immediately upon re-entry.
 
 #### 2. Balancing Real-time Sync vs. Resource Efficiency
@@ -107,7 +107,7 @@ While Firestore offers onSnapshot, using it everywhere is expensive and can lead
 
 #### 3. Customer-Centric Data Persistence
 I implemented a logic where the purchase record is committed to the database the moment a transaction occurs. My reasoning is that a purchase is a finalized action from the user's perspective; therefore, it should be reflected in their "Buying History" immediately, regardless of the delivery status. The Admin Panel then acts as a secondary layer to verify and update these existing records, ensuring transparency and trust between the buyer and the seller.
-###### 📖 Read the full technical breakdown and architecture deep-dive on https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebase-at-age-14-3mbd
+###### 📖 Read the full technical breakdown and architecture deep-dive on https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebasej-at-age-14-3mbd
 ---
 
  ## Project Structure
@@ -190,6 +190,7 @@ service cloud.firestore {
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
 
