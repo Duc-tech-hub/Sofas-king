@@ -192,12 +192,13 @@ service cloud.firestore {
 
 Sofas King has been vetted and recognized by established members of the global developer community.
 
-* **Expert Star & Follow:** This repository was officially starred, and the author followed, by [Sandeep Vashishtha](https://github.com/SandeepVashishtha), a professional Full-Stack Developer and active Open-Source Contributor with over 200+ successful Pull Requests.
+* **Expert Star & Follow:** This repository was officially starred, and the author followed, by [Sandeep Vashishtha](https://github.com/SandeepVashishtha), a professional Full-Stack Developer and active Open-Source Contributor with over 200+ successful Pull Requests, and [Rhythm Pahwa](https://github.com/RhythmPahwa14), a fullstack developer learning in Amazone Machine Learning Summer School.
 
 * **Technical Validation:** The project's modular architecture, Firebase Security Rules, and real-time synchronization logic have been recognized as high-quality implementations by senior peers in the industry.
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
 
