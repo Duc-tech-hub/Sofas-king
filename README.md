@@ -6,7 +6,7 @@ I developed Sofas king as a high-performance, full-stack e-commerce platform fea
 
  ## Project Demo
 ### Video:
-> **https://youtu.be/2ij2Bb9h8tY**
+> **https://youtu.be/mAO8dmsm0Tw**
 ### Link website:
 > **https://sofas-king.web.app**
 ---
@@ -198,6 +198,7 @@ Sofas King has been vetted and recognized by established members of the global d
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
 
