@@ -1,5 +1,3 @@
-
-
 body {
   background-color: #FAF9F6;
   font-family: Arial, sans-serif;
@@ -12,6 +10,17 @@ header {
   background-color: #FAF9F6;
   border-bottom: 2px solid #E6E4DE;
   padding-bottom: 20px;
+}
+
+.services-container {
+  padding-top: 130px !important;
+}
+
+@media (max-width: 768px) {
+
+  .services-container {
+    padding-top: 150px !important;
+  }
 }
 
 :root {

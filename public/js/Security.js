@@ -1,17 +1,21 @@
-import { auth, db } from "./firebase-config.js";
+import { app, auth, db } from "./firebase-config.js";
 import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
 const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com"];
 const root = document.documentElement;
-
+const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
+    isTokenAutoRefreshEnabled: true
+});
 const unlockVisual = () => {
     root.style.setProperty('--auth-blur', '0px');
     root.style.setProperty('--auth-opacity', '1');
     root.style.setProperty('--auth-pointer', 'all');
 };
 
-// Check if user is locked, is redirecting to adminpanel, if is locked, redirect to index.html, if is redirecting to adminpanel and the email is not admin, redirect to home page
+// Check if user is locked, is redirecting to adminpanel, if is locked, redirect to error page, if is redirecting to adminpanel and the email is not admin, redirect to home page
 const checkSecurity = () => {
     return new Promise((resolve) => {
         onAuthStateChanged(auth, async (user) => {
@@ -49,13 +53,24 @@ const checkSecurity = () => {
         });
     });
 };
-
-// Check if the user is login, if not, redirect to index.html
 (async () => {
     const user = await checkSecurity();
-    const path = window.location.pathname.toLowerCase();
-    const protectedFiles = ["adminpanel.html", "cart.html", "comments.html", "home.html", "product", "cart.html", "comments.html", "History.html", "pay-form.html", "search.html", "userinfo.html", "vieworder.html"];
-    const isProtected = protectedFiles.some(file => path.includes(file.toLowerCase()));
+    const path = window.location.pathname;
+
+    let fileName = path.split('/').pop().toLowerCase();
+    if (fileName === "") fileName = "index.html";
+
+    const protectedFiles = [
+        "adminpanel.html", 
+        "cart.html", 
+        "comments.html", 
+        "history.html", 
+        "pay-form.html", 
+        "userinfo.html", 
+        "vieworder.html"
+    ];
+    const isProtected = protectedFiles.includes(fileName);
+
     if (isProtected && !user) {
         window.location.replace("../html/403.html");
         return;

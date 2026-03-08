@@ -1,6 +1,5 @@
-import { auth, db } from "./firebase-config.js";
+import { auth, db, app } from "./firebase-config.js";
 import { collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.querySelector("#reviewform");
     const commentList = document.querySelector("#comment-list");
