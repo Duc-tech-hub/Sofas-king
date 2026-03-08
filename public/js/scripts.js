@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             lastLogin: serverTimestamp()
                         }, { merge: true });
 
-                        window.location.href = "../html/home.html";
+                        window.location.href = "../html/index.html";
 
                     } catch (e) {
                         console.error("Lỗi khi kiểm tra user:", e);

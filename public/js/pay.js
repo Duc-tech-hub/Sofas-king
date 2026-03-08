@@ -1,11 +1,10 @@
-import { auth, db } from "./firebase-config.js";
+import { auth, db, app } from "./firebase-config.js";
 import {
     doc, setDoc, collection, addDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {
     onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
 const STORAGE_KEY = 'sofa_cart_history';
 // Caculate total money
 const calculateTotal = () => {
@@ -57,7 +56,7 @@ const startListeningAdmin = (email) => {
                     updatedAt: Date.now()
                 }, { merge: true });
 
-                window.location.href = "../html/home.html";
+                window.location.href = "../html/index.html";
             }
             else if (data.is_rejected === true) {
                 alert("Payment Rejected! Please check your transaction or contact support.");
@@ -68,7 +67,7 @@ const startListeningAdmin = (email) => {
                     updatedAt: Date.now()
                 }, { merge: true });
 
-                window.location.href = "../html/home.html";
+                window.location.href = "../html/index.html";
             }
         }
     });

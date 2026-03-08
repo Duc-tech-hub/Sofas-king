@@ -1,4 +1,14 @@
+import { auth } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 const STORAGE_KEY = 'sofa_cart_history';
+const getAuthState = () => {
+    return new Promise((resolve) => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+};
 const clean = (str) => {
     if (!str) return "";
     if (typeof str !== 'string') return str;
@@ -20,6 +30,18 @@ const saveToLocal = (item) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 };
 async function handleBuy(productIndex, quantityInput, errorSpan, productName, successline) {
+    const user = await getAuthState();
+    console.log("User detected:", user);
+
+    if (!user) {
+        alert("This function requires login!");
+        if (errorSpan) {
+            errorSpan.style.color = "red";
+            errorSpan.textContent = "Please login to add to cart!";
+        }
+        return;
+    }
+
     const checkedSize = document.querySelector(`input[name="radio"]:checked`);
     if (!checkedSize) {
         alert("Please select a size for the product!");
@@ -77,7 +99,7 @@ const renderCart = () => {
         emptyMsg.className = "empty-cart-msg text-center p-4";
         emptyMsg.innerHTML = `
             <p style="color: #888; font-style: italic;">Your cart is empty.</p>
-            <a href="home.html" class="btn btn-sm btn-outline-primary">Go shopping</a>
+            <a href="index.html" class="btn btn-sm btn-outline-primary">Go shopping</a>
         `;
         if (payButton) {
             container.insertBefore(emptyMsg, payButton);
