@@ -7,8 +7,6 @@ I developed Sofas king as a high-performance, full-stack e-commerce platform fea
  ## Project Demo
 ### Video:
 > **https://youtu.be/mAO8dmsm0Tw**
-### Link website:
-> **https://sofas-king.web.app**
 ---
 ## AI-Powered Development (AI Collaboration) I effectively leveraged Generative AI (Gemini) as a core part of my development workflow to build and refine this project:
 
@@ -198,6 +196,7 @@ Sofas King has been vetted and recognized by established members of the global d
 
 
 **Developed by duck.sssop0356@gmail.com I am a 14-year-old developer passionate about building scalable and secure web solutions.**
+
 
 
 
