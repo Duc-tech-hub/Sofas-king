@@ -3,12 +3,12 @@ import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-
 import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
-const ADMIN_EMAILS = ["your_admin_emails"];
+const ADMIN_EMAILS = ["Your_email"];
 const root = document.documentElement;
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
-    isTokenAutoRefreshEnabled: true
-});
+ const appCheck = initializeAppCheck(app, {
+     provider: new ReCaptchaV3Provider('Your_site_key'),
+     isTokenAutoRefreshEnabled: true
+ });
 const unlockVisual = () => {
     root.style.setProperty('--auth-blur', '0px');
     root.style.setProperty('--auth-opacity', '1');
@@ -38,7 +38,7 @@ const checkSecurity = () => {
                     if (path.includes("adminpanel.html")) {
                         if (!ADMIN_EMAILS.includes(user.email)) {
                             console.warn("Warning: You do not have permission to access this page");
-                            window.location.replace("../html/403_2.html");
+                            window.location.replace("../html/403.html");
                             return resolve(null);
                         }
                     }
@@ -75,5 +75,4 @@ const checkSecurity = () => {
         window.location.replace("../html/403.html");
         return;
     }
-
 })();

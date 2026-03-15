@@ -14,7 +14,46 @@ body {
     top: 25px;
     left: 25px;
 }
+#address-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid #ddd;
+    border-top: none;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
 
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+.address-group {
+    position: relative;
+    max-width: 450px;
+    margin: 20px 0;
+    font-family: sans-serif;
+    text-align: left;
+}
+.suggestion-item:hover {
+    background-color: #f0f7ff;
+}
+input.inputinfo {
+    width: 100%;
+    display: block;
+    background: transparent;
+    border: 1px solid #555;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
 .btn-secondary {
     background-color: #ffffff;
     border: 1px solid #ddd;
@@ -108,4 +147,40 @@ span:not(.inputinfo) {
     .inputinfo {
         padding: 14px 10px;
     }
+}
+
+input.inputinfo:focus {
+    border-color: #2ecc71;
+}
+.Button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Nút Update màu xanh hiện đại */
+.btn-update {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-update:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+.btn-logout {
+    background: #e74c3c;
+    color: white;
+    opacity: 0.9;
+}
+
+.btn-logout:hover {
+    opacity: 1;
+    background: #c0392b;
 }

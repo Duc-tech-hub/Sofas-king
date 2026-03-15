@@ -149,38 +149,6 @@ body {
     font-weight: 600;
 }
 
-#recheck {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-bottom: 20px;
-}
-
-#recheck:hover {
-    background-color: #f8f9fa;
-    border-color: #d2e3fc;
-}
-
-#recheck img {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-}
-
-#recheck p {
-    margin: 0;
-    color: #3c4043;
-    font-size: 14px;
-    font-weight: 500;
-}
-
 #output_money {
     display: block;
     text-align: left;

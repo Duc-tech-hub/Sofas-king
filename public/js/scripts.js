@@ -16,30 +16,41 @@ document.addEventListener("DOMContentLoaded", () => {
     if (googleMethodButton) {
         googleMethodButton.addEventListener("click", () => {
             isLoggingIn = true;
+
             signInWithPopup(auth, googleProvider)
                 .then(async (result) => {
                     const user = result.user;
+                    const addressField = document.querySelector("#address");
+                    const phoneField = document.querySelector("#Phone_number");
+                    const addressValue = addressField?.value.trim() || null;
+                    const phoneValue = phoneField?.value.trim() || null;
+
                     try {
-                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        const userDocRef = doc(db, "users", user.uid);
+                        const userDoc = await getDoc(userDocRef);
+
                         if (userDoc.exists() && userDoc.data().is_disabled === true) {
                             alert("Your account has been locked!");
                             await signOut(auth);
                             isLoggingIn = false;
                             return;
                         }
-                        await setDoc(doc(db, "users", user.uid), {
+                        await setDoc(userDocRef, {
                             email: user.email,
-                            lastLogin: serverTimestamp()
+                            address: addressValue,
+                            phoneNumber: phoneValue,
+                            lastLogin: serverTimestamp(),
+                            is_disabled: false
                         }, { merge: true });
 
+                        console.log("Data saved successfully!");
                         window.location.href = "../html/index.html";
 
                     } catch (e) {
-                        console.error("Lỗi khi kiểm tra user:", e);
-                        alert("System error. Please try again.");
+                        console.error("Lỗi xử lý Firestore:", e);
+                        alert("System error occurred.");
                         await signOut(auth);
                     }
-
                 })
                 .catch((error) => {
                     console.error("LỖI LOGIN:", error.code, error.message);

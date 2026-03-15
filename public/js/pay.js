@@ -1,9 +1,9 @@
 import { auth, db, app } from "./firebase-config.js";
-import {
-    doc, setDoc, collection, addDoc, onSnapshot
+import { 
+    doc, setDoc, collection, addDoc, onSnapshot, getDoc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import {
-    onAuthStateChanged, reauthenticateWithPopup, GoogleAuthProvider
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 const STORAGE_KEY = 'sofa_cart_history';
 // Caculate total money
@@ -29,14 +29,12 @@ const startListeningAdmin = (email) => {
     const statusRef = doc(db, "history", email, "admin_verify", "status");
     const note = document.getElementById("note");
     const confirmBtn = document.getElementById("confirmed-sent");
-    const recheckBtn = document.getElementById("recheck");
 
     return onSnapshot(statusRef, async (docSnap) => {
         if (!docSnap.exists()) return;
         const data = docSnap.data();
         if (data.is_waiting === true && !data.is_confirmed && !data.is_rejected) {
             if (confirmBtn) confirmBtn.style.display = "none";
-            if (recheckBtn) recheckBtn.style.display = "none";
             if (note) {
                 note.style.display = "block";
                 note.style.color = "orange";
@@ -107,41 +105,30 @@ const handleConfirmRequest = async (user, totalAmount, address) => {
         return false;
     }
 };
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => { 
     if (!user) return;
+    const addressInput = document.getElementById("address");
+    
+    try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userDocRef);
 
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            if (userData.address && addressInput) {
+                addressInput.value = userData.address;
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi lấy địa chỉ:", error);
+    }
     const totalAmount = calculateTotal();
     startListeningAdmin(user.email);
-
-    const recheckBtn = document.getElementById("recheck");
     const confirmBtn = document.getElementById("confirmed-sent");
-
-    if (recheckBtn) {
-        recheckBtn.addEventListener("click", async () => {
-            const provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'login', max_age: '0' });
-
-            try {
-                await reauthenticateWithPopup(user, provider);
-                recheckBtn.innerHTML = "<p>Verified ✓</p>";
-                recheckBtn.disabled = true;
-                if (confirmBtn) {
-                    confirmBtn.style.display = "block";
-                    confirmBtn.style.opacity = "1";
-                }
-            } catch (e) {
-                if (e.code === 'auth/user-mismatch') {
-                    alert("Wrong account! Please use: " + user.email);
-                }
-            }
-        });
-    }
 
     if (confirmBtn) {
         confirmBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-
-            const addressInput = document.getElementById("address");
             const addressValue = addressInput ? addressInput.value.trim() : "";
 
             if (!addressValue) {
