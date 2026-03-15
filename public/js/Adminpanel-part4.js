@@ -39,15 +39,14 @@ const loadShippingDashboard = () => {
             const order = docSnap.data();
             const docId = docSnap.id;
             const currentStatus = (order.status || "").toLowerCase();
-
             const firstItem = (order.items && order.items.length > 0) ? order.items[0] : {};
-
             const finalAddress = order.address || order.deliveryAddress || firstItem.address || 'No address provided';
+            const finalPhone = order.phoneNumber || order.customerPhone || firstItem.phoneNumber || 'No phone number provided';
+            // ---------------------------------
 
             const finalTotal = order.items ? order.items.reduce((sum, item) => {
                 return sum + (Number(item.Price) || 0) * (Number(item.quantity) || 1);
             }, 0) : 0;
-
             if (currentStatus === "packing") {
                 pendingDeliveryCount++;
             }
@@ -67,6 +66,7 @@ const loadShippingDashboard = () => {
 
             <div style="margin: 12px 0; border-top: 1px solid #eee; padding-top: 10px;">
                 <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Customer:</strong> ${order.customerEmail || 'Guest'}</p>
+                <p style="margin: 4px 0; font-size: 0.9rem;"><strong>Phone:</strong> ${finalPhone}</p>
                 <p style="margin: 4px 0; font-size: 0.9rem; color: #d9534f;"><strong>Address:</strong> ${finalAddress}</p>
                 <p style="margin: 4px 0; font-size: 1rem; color: #2ecc71;"><strong>Total Bill: $${finalTotal.toLocaleString()}</strong></p>
             </div>
