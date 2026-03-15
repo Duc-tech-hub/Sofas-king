@@ -10,7 +10,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 20px;
 }
 #address:focus {
     border-color: #3498db;
@@ -19,7 +20,7 @@ body {
 
 .address-group {
     position: relative;
-    max-width: 450px;
+    width: 100%;
     margin: 20px 0;
     font-family: sans-serif;
     text-align: left;
@@ -52,11 +53,12 @@ body {
 }
 .login-container {
     background: #ffffff;
-    padding: 40px;
+    padding: 30px 20px;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     width: 100%;
     max-width: 400px;
+    margin: auto;
 }
 
 h2 {
@@ -185,4 +187,22 @@ h2 {
 
 .redirect-link a:hover {
     text-decoration: underline;
+}
+@media (max-width: 480px) {
+    body {
+        align-items: flex-start;
+        padding-top: 50px;
+    }
+    
+    .login-container {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    .input-group, .address-group {
+        margin-bottom: 15px;
+    }
 }
