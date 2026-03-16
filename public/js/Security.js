@@ -5,10 +5,10 @@ import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com
 
 const ADMIN_EMAILS = ["Your_email"];
 const root = document.documentElement;
- const appCheck = initializeAppCheck(app, {
-     provider: new ReCaptchaV3Provider('Your_site_key'),
-     isTokenAutoRefreshEnabled: true
- });
+const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
+    isTokenAutoRefreshEnabled: true
+});
 const unlockVisual = () => {
     root.style.setProperty('--auth-blur', '0px');
     root.style.setProperty('--auth-opacity', '1');
@@ -61,12 +61,12 @@ const checkSecurity = () => {
     if (fileName === "") fileName = "index.html";
 
     const protectedFiles = [
-        "adminpanel.html", 
-        "cart.html", 
-        "comments.html", 
-        "history.html", 
-        "pay-form.html", 
-        "userinfo.html", 
+        "adminpanel.html",
+        "cart.html",
+        "comments.html",
+        "history.html",
+        "pay-form.html",
+        "userinfo.html",
         "vieworder.html"
     ];
     const isProtected = protectedFiles.includes(fileName);

@@ -1,8 +1,22 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const registerForm = document.querySelector("#register-form");
+document.querySelectorAll('.btn-toggle').forEach(icon => {
+    icon.addEventListener('click', function () {
+        const targetId = this.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            this.classList.replace('bi-eye-slash', 'bi-eye');
+        } else {
+            input.type = 'password';
+            this.classList.replace('bi-eye', 'bi-eye-slash');
+        }
+    });
+});
 
 registerForm?.addEventListener("submit", async (e) => {
     e.preventDefault();

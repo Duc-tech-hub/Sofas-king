@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     const user = result.user;
                     const addressField = document.querySelector("#address");
                     const phoneField = document.querySelector("#Phone_number");
-                    const addressValue = addressField?.value.trim() || null;
-                    const phoneValue = phoneField?.value.trim() || null;
+                    const addressValue = addressField?.value.trim();
+                    const phoneValue = phoneField?.value.trim();
 
                     try {
                         const userDocRef = doc(db, "users", user.uid);
@@ -35,17 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
                             isLoggingIn = false;
                             return;
                         }
-                        await setDoc(userDocRef, {
+                        const updateData = {
                             email: user.email,
-                            address: addressValue,
-                            phoneNumber: phoneValue,
                             lastLogin: serverTimestamp(),
-                            is_disabled: false
-                        }, { merge: true });
-
+                            is_disabled: userDoc.exists() ? userDoc.data().is_disabled : false
+                        };
+                        if (addressValue) updateData.address = addressValue;
+                        if (phoneValue) updateData.phoneNumber = phoneValue;
+                        await setDoc(userDocRef, updateData, { merge: true });
                         console.log("Data saved successfully!");
                         window.location.href = "../html/index.html";
-
                     } catch (e) {
                         console.error("Lỗi xử lý Firestore:", e);
                         alert("System error occurred.");
