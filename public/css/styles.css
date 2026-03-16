@@ -5,7 +5,14 @@ body {
   margin: 0;
   padding: 0;
 }
-
+#p-image {
+    min-height: 400px;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+#p-image:hover {
+    transform: scale(1.02);
+}
 header {
   background-color: #FAF9F6;
   border-bottom: 2px solid #E6E4DE;

@@ -92,80 +92,7 @@
   </header>
   <section class="product-section" id="product">
     <h2 class="section-title">Our best seller products</h2>
-    <div class="product-grid">
-      <div class="product-card">
-        <a href="product1.html" class="product-link">
-          <img src="../image/imagep1.jpg" alt="Products: Emerald Luxe" />
-          <p class="text">Emerald Luxe</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product2.html" class="product-link">
-          <img src="../image/imagep2.jpg" alt="Products: Ivory Royale" />
-          <p class="text">Ivory Royale</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product3.html" class="product-link">
-          <img src="../image/imagep3.jpg" alt="Products: Crimson Classic" />
-          <p class="text">Crimson Classic</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product4.html" class="product-link">
-          <img src="../image/imagep4.jpg" alt="Products: Champagne Elegance" />
-          <p class="text">Champagne Elegance</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product5.html" class="product-link">
-          <img src="../image/imagep5.jpg" alt="Products: Rose Charm" />
-          <p class="text">Rose Charm</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product6.html" class="product-link">
-          <img src="../image/imagep6.jpg" alt="Products: Granite Moderno" />
-          <p class="text">Granite Moderno</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product7.html" class="product-link">
-          <img src="../image/imagep7.jpg" alt="Products: Sapphire Relaxa" />
-          <p class="text">Sapphire Relaxa</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product8.html" class="product-link">
-          <img src="../image/imagep8.jpg" alt="Products: Olive Haven" />
-          <p class="text">Olive Haven</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product9.html" class="product-link">
-          <img src="../image/imagep9.jpg" alt="Products: Pearl Serenity" />
-          <p class="text">Pearl Serenity</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product10.html" class="product-link">
-          <img src="../image/imagep10.jpg" alt="Products: Amber Glow" />
-          <p class="text">Amber Glow</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product11.html" class="product-link">
-          <img src="../image/imagep11.jpg" alt="Products: Charcoal Grace" />
-          <p class="text">Charcoal Grace</p>
-        </a>
-      </div>
-      <div class="product-card">
-        <a href="product12.html" class="product-link">
-          <img src="../image/imagep12.jpg" alt="Products: Midnight Comfort" />
-          <p class="text">Midnight Comfort</p>
-        </a>
-      </div>
-    </div>
+    <div class="product-grid" id="product-list"> </div>
   </section>
   <section class="container py-5">
     <form id="reviewform">
@@ -175,48 +102,9 @@
         <div id="comment-list"></div>
       </div>
 
-      <p>Choose a checkbox to review:</p>
-      <div class="row justify-content-center">
-        <div class="col-md-5">
-          <label>
-            <input type="radio" name="product" id="checkp1" value="Emerald Luxe" />
-            Emerald Luxe</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp2" value="Crimson Classic" />
-            Crimson Classic</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp3" value="Rosé Charm" />
-            Rosé Charm</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp4" value="Sapphire Relaxa" />
-            Sapphire Relaxa</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp5" value="Pearl Serenity" />
-            Pearl Serenity</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp6" value="Charcoal Grace" />
-            Charcoal Grace</label><br />
-        </div>
-        <div class="col-md-5">
-          <label>
-            <input type="radio" name="product" id="checkp7" value="Ivory Royale" />
-            Ivory Royale</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp8" value="Champagne Elegance" />
-            Champagne Elegance</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp9" value="Granite Moderno" />
-            Granite Moderno</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp10" value="Olive Haven" />
-            Olive Haven</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp11" value="Amber Glow" />
-            Amber Glow</label><br />
-          <label>
-            <input type="radio" name="product" id="checkp12" value="Midnight Comfort" />
-            Midnight Comfort</label><br />
-        </div>
+      <p>Choose a product to review:</p>
+      <div class="row justify-content-center" id="review-radio-container">
+        <p class="text-muted text-center">Loading products...</p>
       </div>
       <span class="error" id="errorcheckp"></span>
       <div class="mb-3">
@@ -264,7 +152,8 @@
     crossorigin="anonymous"></script>
   <script type="module" src="../js/Review.js"></script>
   <script type="module" src="../js/Security.js"></script>
-  <script src="https://www.google.com/recaptcha/api.js?render=Your_site_key"></script>
+  <script type="module" src="../js/LoadProducts.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=Your_recapcha_provider"></script>
 </body>
 
 </html>

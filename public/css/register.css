@@ -9,8 +9,30 @@ body {
     background: #f4f7f6;
     height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: center;    
     align-items: center;
+}
+.input-group div {
+    position: relative;
+}
+.btn-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 100;
+    font-size: 1.2rem;
+}
+
+.input-group input[type="password"],
+.input-group input[type="text"] {
+    padding-right: 45px !important;
+}
+
+.form-control {
+    padding-right: 40px !important;
 }
 
 .register-container {

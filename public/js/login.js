@@ -4,6 +4,18 @@ import { doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebas
 
 const loginForm = document.querySelector("#login-form");
 
+document.querySelector('.btn-toggle-login').addEventListener('click', function () {
+    const passwordInput = document.getElementById('login-password');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        this.classList.replace('bi-eye-slash', 'bi-eye');
+    } else {
+        passwordInput.type = 'password';
+        this.classList.replace('bi-eye', 'bi-eye-slash');
+    }
+});
+
 loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const username = document.querySelector("#login-username").value.trim();
@@ -24,7 +36,7 @@ loginForm?.addEventListener("submit", async (e) => {
         await updateDoc(userDocRef, updateData);
 
         alert("Login successful!");
-        window.location.href = "../html/index.html"; 
+        window.location.href = "../html/index.html";
 
     } catch (error) {
         console.error("Login Error:", error);

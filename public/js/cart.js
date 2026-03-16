@@ -84,49 +84,66 @@ async function handleBuy(productIndex, quantityInput, errorSpan, productName, su
 }
 
 // Show all items in cart
-const renderCart = () => {
+export async function addToCart(productData) {
+    const user = await getAuthState();
+
+    if (!user) {
+        alert("This function requires login!");
+        return false;
+    }
+
+    const newItem = {
+        Name: productData.name,
+        Size: productData.size || "Standard",
+        quantity: parseInt(productData.quantity) || 1,
+        Price: productData.price,
+        Image: productData.image,
+        timestamp: Date.now()
+    };
+
+    saveToLocal(newItem);
+    alert(`Added ${productData.name} to cart!`);
+    renderCart();
+    return true;
+}
+
+export const renderCart = () => {
     const container = document.getElementById("cont");
     const payButton = document.getElementById("redirect");
     if (!container) return;
 
     const items = getCartItems();
-    const oldItems = container.querySelectorAll(".cart-item-row, .empty-cart-msg");
-    oldItems.forEach(el => el.remove());
+    
+    container.innerHTML = '<h3>Your Cart</h3>'; 
 
     if (items.length === 0) {
         if (payButton) payButton.style.display = "none";
-        const emptyMsg = document.createElement("div");
-        emptyMsg.className = "empty-cart-msg text-center p-4";
-        emptyMsg.innerHTML = `
-            <p style="color: #888; font-style: italic;">Your cart is empty.</p>
-            <a href="index.html" class="btn btn-sm btn-outline-primary">Go shopping</a>
-        `;
-        if (payButton) {
-            container.insertBefore(emptyMsg, payButton);
-        } else {
-            container.appendChild(emptyMsg);
-        }
+        container.insertAdjacentHTML('beforeend', `
+            <div class="empty-cart-msg text-center p-4">
+                <p style="color: #888; font-style: italic;">Your cart is empty.</p>
+                <a href="index.html" class="btn btn-sm btn-outline-primary">Go shopping</a>
+            </div>
+        `);
     } else {
-        if (payButton) payButton.style.display = "block";
+        if (payButton) {
+            payButton.style.display = "block";
+            container.appendChild(payButton);
+        }
+
         items.forEach((item, index) => {
             const div = document.createElement("div");
             div.className = "cart-item-row d-flex justify-content-between border-bottom p-2 mb-2 align-items-center";
             div.innerHTML = `
-    <span>
-        <strong>${clean(item.Name)}</strong> (${clean(item.Size)}) x ${clean(item.quantity)}
-    </span>
-    <button class="btn btn-sm btn-danger delete-btn" data-index="${index}">X</button>
-`;
-
-            if (payButton) {
-                container.insertBefore(div, payButton);
-            } else {
-                container.appendChild(div);
-            }
+                <span>
+                    <strong>${clean(item.Name)}</strong> <br>
+                    <small>${clean(item.Size)} x ${item.quantity}</small>
+                </span>
+                <button class="btn btn-sm btn-danger delete-btn" data-index="${index}">X</button>
+            `;
+            payButton ? container.insertBefore(div, payButton) : container.appendChild(div);
         });
-
         container.querySelectorAll(".delete-btn").forEach(btn => {
-            btn.onclick = function () {
+            btn.onclick = function() {
                 const idx = this.getAttribute("data-index");
                 let currentItems = getCartItems();
                 currentItems.splice(idx, 1);
@@ -136,30 +153,11 @@ const renderCart = () => {
         });
     }
 };
-
-// Take value from html
 document.addEventListener("DOMContentLoaded", () => {
-    const names = ["Emerald Luxe", "Ivory Royale", "Crimson Classic", "Champagne Elegance", "Rosé Charm", "Granite Moderno", "Sapphire Relaxa", "Olive Haven", "Pearl Serenity", "Amber Glow", "Charcoal Grace", "Midnight Comfort"];
-
-    for (let i = 1; i <= 12; i++) {
-        const btn = document.querySelector(`#buttonbuy${i}`);
-        if (btn) {
-            const qty = document.querySelector(`#number${i}`);
-            const err = document.querySelector(`#errorcheck${i}`);
-            const success = document.querySelector(`#successlinep${i}`);
-
-            btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                handleBuy(i, qty, err, names[i - 1], success);
-            });
-        }
-    }
     renderCart();
-
+    
     const payButton = document.getElementById("redirect");
     if (payButton) {
-        payButton.addEventListener("click", () => {
-            window.location.href = '../html/pay-form.html';
-        });
+        payButton.onclick = () => window.location.href = '../html/pay-form.html';
     }
 });
