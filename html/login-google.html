@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/Account.css">
+</head>
+
+<body>
+    <a aria-label="Go back" class="btn btn-secondary position-absolute top-0 start-0 m-3" href="register.html">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+    <div class="form">
+        <h2>Continue with:</h2>
+        <button id="googlemethod"> <img src="../image/Logogoogle.jpg" alt="Login with Google">
+            <p>Login with Google</p>
+        </button><br>
+        <div class="address-group">
+            <label for="address">Delivery address:</label>
+            <input name="address" type="text" placeholder="Provide your delivery address here" id="address">
+            <div id="address-suggestions" class="suggestions-container"></div>
+        </div>
+        <label for="Phone_number">Your phone number:</label>
+        <input name="Phone_number" type="text" placeholder="Provide your phone number here" id="Phone_number">
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script type="module" src="../js/scripts.js"></script>
+    <script type="module" src="../js/Security.js"></script>
+    <script type="module" src="../js/API.js" </body>
+
+</html >

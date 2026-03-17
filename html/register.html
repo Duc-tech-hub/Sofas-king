@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="../css/register.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <a aria-label="Go back" class="btn btn-secondary position-absolute top-0 start-0 m-3" href="index.html">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+    <div class="register-container">
+        <form id="register-form" class="register-form">
+            <h2>Create Account</h2>
+            <p class="subtitle">Join us to discover quality furniture</p>
+
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+                <div style="position: relative; width: 100%;">
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                    <i class="bi bi-eye-slash btn-toggle" data-target="password"></i>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="confirm-password">Confirm Password</label>
+                <div style="position: relative; width: 100%;">
+                    <input type="password" id="confirm-password" placeholder="Repeat your password" required>
+                    <i class="bi bi-eye-slash btn-toggle" data-target="confirm-password"></i>
+                </div>
+            </div>
+            <button type="submit" class="btn-register">Register</button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <a href="login-google.html" id="login-google" class="btn-google-link">
+                <img class="btn-google-img" src="../image/Logogoogle.jpg" alt="Google Logo">
+                Sign up with Google
+            </a>
+
+            <p class="login-link">
+                Already have an account? <a href="login.html">Login here</a>
+            </p>
+            <p class="login-link">
+                By register account, you accept our privacy and policy terms: <a href="privacy.html">Privacy &
+                    Policy</a>
+            </p>
+        </form>
+    </div>
+    <script type="module" src="../js/Register.js"></script>
+    <script type="module" src="../js/Security.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=Your_recapcha_provider"></script>
+</body>
+
+</html>
