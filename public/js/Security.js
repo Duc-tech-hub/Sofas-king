@@ -4,16 +4,10 @@ import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
 const ADMIN_EMAILS = ["Your_email"];
-const root = document.documentElement;
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
-    isTokenAutoRefreshEnabled: true
-});
-const unlockVisual = () => {
-    root.style.setProperty('--auth-blur', '0px');
-    root.style.setProperty('--auth-opacity', '1');
-    root.style.setProperty('--auth-pointer', 'all');
-};
+// const appCheck = initializeAppCheck(app, {
+//     provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
+//     isTokenAutoRefreshEnabled: true
+// });
 
 // Check if user is locked, is redirecting to adminpanel, if is locked, redirect to error page, if is redirecting to adminpanel and the email is not admin, redirect to home page
 const checkSecurity = () => {
@@ -43,8 +37,6 @@ const checkSecurity = () => {
                         }
                     }
 
-                    unlockVisual();
-
                 } catch (error) {
                     console.error("Security Check Error:", error);
                 }
@@ -61,12 +53,12 @@ const checkSecurity = () => {
     if (fileName === "") fileName = "index.html";
 
     const protectedFiles = [
-        "adminpanel.html",
-        "cart.html",
-        "comments.html",
-        "history.html",
-        "pay-form.html",
-        "userinfo.html",
+        "adminpanel.html", 
+        "cart.html", 
+        "comments.html", 
+        "history.html", 
+        "pay-form.html", 
+        "userinfo.html", 
         "vieworder.html"
     ];
     const isProtected = protectedFiles.includes(fileName);

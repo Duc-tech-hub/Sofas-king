@@ -5,17 +5,33 @@ import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.
 const addressInp = document.getElementById('address');
 const phoneInp = document.getElementById('inputinfo_phone');
 const updateBtn = document.getElementById('update_btn');
+const usernameDisplay = document.getElementById('inputinfo_username');
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        document.getElementById('inputinfo_username').textContent = user.email;
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-            const data = userDoc.data();
-            addressInp.value = data.address || "";
-            phoneInp.value = data.phoneNumber || "";
+        try {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+
+            if (userDoc.exists()) {
+                const data = userDoc.data();
+                const userEmail = data.email || user.email || ""; 
+                if (userEmail.includes("@account.com")) {
+                    usernameDisplay.textContent = userEmail.split('@')[0];
+                } else {
+                    usernameDisplay.textContent = userEmail;
+                }
+                if (addressInp) addressInp.value = data.address || "";
+                if (phoneInp) phoneInp.value = data.phoneNumber || "";
+            }
+        } catch (error) {
+            console.error("Lỗi lấy data:", error);
         }
+    } else {
+        if (usernameDisplay) usernameDisplay.textContent = "Guest";
     }
 });
+
 updateBtn.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;

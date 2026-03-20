@@ -25,11 +25,6 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="search.html">
-                <img class="imglink" src="../image/Search.jpg" alt="Search_products">
-              </a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="#product">Products</a>
             </li>
             <li class="nav-item">
@@ -44,8 +39,10 @@
             <li class="nav-item">
               <a class="nav-link" href="vieworder.html">Orders</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" id="nav-acp" style="display: none;">
               <a class="nav-link" href="Adminpanel.html">ACP</a>
+            </li>
+            <li class="nav-item" id="nav-auth">
             </li>
           </ul>
         </div>
@@ -92,6 +89,11 @@
   </header>
   <section class="product-section" id="product">
     <h2 class="section-title">Our best seller products</h2>
+
+    <div class="search-wrap">
+      <input type="text" id="user-search-input" placeholder="Search products...">
+    </div>
+
     <div class="product-grid" id="product-list"> </div>
   </section>
   <section class="container py-5">
@@ -102,32 +104,37 @@
         <div id="comment-list"></div>
       </div>
 
-      <p>Choose a product to review:</p>
-      <div class="row justify-content-center" id="review-radio-container">
-        <p class="text-muted text-center">Loading products...</p>
-      </div>
-      <span class="error" id="errorcheckp"></span>
+      <p class="mt-4">Choose a product to review:</p>
       <div class="mb-3">
-        <label for="rating" class="form-label">Review(1-5 stars)</label><br />
-        <label>
-          <input type="radio" name="stars" name="stars" id="onestar" value="1" />⭐</label><br />
-        <label>
-          <input type="radio" name="stars" name="stars" id="twostar" value="2" />⭐⭐</label><br />
-        <label>
-          <input type="radio" name="stars" name="stars" id="threestar" value="3" />⭐⭐⭐</label><br />
-        <label>
-          <input type="radio" name="stars" name="stars" id="fourstar" value="4" />⭐⭐⭐⭐</label><br />
-        <label>
-          <input type="radio" name="stars" name="stars" id="fivestar" value="5" />⭐⭐⭐⭐⭐</label><br />
+        <select class="form-select" id="review-product-select" required>
+          <option value="" selected disabled>-- Select a product --</option>
+        </select>
+        <span class="error" id="errorcheckp"></span>
       </div>
-      <span class="error" id="errorstars"></span>
+
+      <div class="mb-3">
+        <label for="rating-select" class="form-label">Review Rating</label>
+        <select class="form-select" id="rating-select" required>
+          <option value="" selected disabled>-- Choose stars --</option>
+          <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+          <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+          <option value="3">⭐⭐⭐ (3 Stars)</option>
+          <option value="2">⭐⭐ (2 Stars)</option>
+          <option value="1">⭐ (1 Star)</option>
+        </select>
+        <span class="error" id="errorstars"></span>
+      </div>
+
       <div class="mb-3">
         <label for="comment" class="form-label">Comment</label>
         <textarea class="form-control" id="comment" rows="3" placeholder="Write your comment..."></textarea>
+        <span class="error" id="errorcomment"></span>
       </div>
-      <span class="error" id="errorcomment"></span><br />
+
       <button class="btn btn-primary" type="submit">Submit</button>
-      <span class="successline" id="successline"></span>
+      <div class="mt-2">
+        <span class="successline" id="successline"></span>
+      </div>
     </form>
   </section>
   <footer class="footer" id="about">
@@ -152,7 +159,9 @@
     crossorigin="anonymous"></script>
   <script type="module" src="../js/Review.js"></script>
   <script type="module" src="../js/Security.js"></script>
+  <script type="module" src="../js/Manage_nav_bar.js"></script>
   <script type="module" src="../js/LoadProducts.js"></script>
+  <script type="module" src="../js/search.js"></script>
   <script src="https://www.google.com/recaptcha/api.js?render=Your_recapcha_provider"></script>
 </body>
 

@@ -35,8 +35,19 @@ async function loadProductDetails() {
 
             if (addToCartBtn) {
                 addToCartBtn.onclick = async () => {
-                    const qty = document.getElementById('p-quantity').value;
+                    const qty = parseInt(document.getElementById('p-quantity').value) || 0;
+                    const currentStock = parseInt(p.Stock) || 0;
+                    if (qty <= 0) {
+                        alert("You must buy more than 0 product!");
+                        return;
+                    }
+
+                    if (qty > currentStock) {
+                        alert(`Sorry, there is not enough stock!`);
+                        return;
+                    }
                     const success = await addToCart({
+                        productId: productId,
                         name: p.Name,
                         price: p.Price,
                         image: p.Image,

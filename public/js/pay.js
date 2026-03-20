@@ -1,18 +1,22 @@
-import { auth, db, app } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { 
-    doc, setDoc, collection, addDoc, onSnapshot, getDoc
+    doc, setDoc, collection, addDoc, onSnapshot, getDoc, updateDoc, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import {
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-const STORAGE_KEY = 'sofa_cart_history';
-// Caculate total money
-const calculateTotal = () => {
-    const rawData = localStorage.getItem(STORAGE_KEY);
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+const getCloudCart = async (uid) => {
+    const cartRef = doc(db, "carts", uid);
+    const snap = await getDoc(cartRef);
+    return snap.exists() ? snap.data().items : [];
+};
+const resetCloudCart = async (uid) => {
+    const cartRef = doc(db, "carts", uid);
+    await setDoc(cartRef, { items: [] }); // Reset mảng items về rỗng
+    console.log("Cloud Cart đã được reset.");
+};
+const calculateTotal = async (uid) => {
     const outputMoneyEl = document.getElementById("output_money");
-    if (!rawData) return 0;
-
-    const items = JSON.parse(rawData);
+    const items = await getCloudCart(uid);
+    
     const total = items.reduce((sum, item) => {
         const price = parseFloat(item.Price) || 0;
         const qty = parseInt(item.quantity) || 0;
@@ -20,19 +24,23 @@ const calculateTotal = () => {
     }, 0);
 
     if (outputMoneyEl) {
-        outputMoneyEl.textContent = `Total: $${total.toLocaleString()}`;
+        outputMoneyEl.textContent = `Total: ${total.toLocaleString()} VND`;
     }
-    return total;
+    return { total, items };
 };
-// Listen to admin verify
-const startListeningAdmin = (email) => {
-    const statusRef = doc(db, "history", email, "admin_verify", "status");
+
+let unsubAdminListener = null; 
+const startListeningAdmin = (uid) => {
+    if (unsubAdminListener) unsubAdminListener();
+
+    const statusRef = doc(db, "history", uid, "admin_verify", "status");
     const note = document.getElementById("note");
     const confirmBtn = document.getElementById("confirmed-sent");
 
-    return onSnapshot(statusRef, async (docSnap) => {
+    unsubAdminListener = onSnapshot(statusRef, async (docSnap) => {
         if (!docSnap.exists()) return;
         const data = docSnap.data();
+
         if (data.is_waiting === true && !data.is_confirmed && !data.is_rejected) {
             if (confirmBtn) confirmBtn.style.display = "none";
             if (note) {
@@ -43,113 +51,117 @@ const startListeningAdmin = (email) => {
             return;
         }
         if (data.is_confirmed === true || data.is_rejected === true) {
-            localStorage.removeItem(STORAGE_KEY);
-
+            await resetCloudCart(uid);
+            
             if (data.is_confirmed === true) {
                 alert("Payment Successful! Your order has been placed.");
-                await setDoc(statusRef, {
-                    is_waiting: false,
-                    is_confirmed: false,
-                    is_rejected: false,
-                    updatedAt: Date.now()
-                }, { merge: true });
-
-                window.location.href = "../html/index.html";
+            } else {
+                alert("Payment Rejected! Your cart has been cleared.");
             }
-            else if (data.is_rejected === true) {
-                alert("Payment Rejected! Please check your transaction or contact support.");
-                await setDoc(statusRef, {
-                    is_waiting: false,
-                    is_confirmed: false,
-                    is_rejected: false,
-                    updatedAt: Date.now()
-                }, { merge: true });
 
-                window.location.href = "../html/index.html";
+            if (confirmBtn) {
+                confirmBtn.style.display = "block";
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = "I have sent money.";
             }
+            if (note) note.style.display = "none";
+            await updateDoc(statusRef, {
+                is_waiting: false,
+                is_confirmed: false,
+                is_rejected: false,
+                updatedAt: Date.now(),
+                totalBill: 0
+            });
+
+            window.location.href = "../html/index.html";
         }
     });
 };
-// Send request to admin
-const handleConfirmRequest = async (user, totalAmount, address) => {
-    const rawData = localStorage.getItem(STORAGE_KEY);
-    if (!rawData || !user) return false;
+
+const handleConfirmRequest = async (user, totalAmount, items, address) => {
+    if (!items || items.length === 0 || !user) return false;
 
     try {
-        const items = JSON.parse(rawData);
-        const pendingCol = collection(db, "history", user.email, "pending_orders");
+        let finalName = user.email;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            finalName = userData.email || user.email;
+        }
 
+        const pendingCol = collection(db, "history", user.uid, "pending_orders");
         for (const item of items) {
             await addDoc(pendingCol, {
-                ...item,
+                productId: item.productId || null, 
+                Name: item.Name,
+                Price: item.Price,
+                quantity: item.quantity,
+                Size: item.Size || "Standard",
+                userName: finalName,
                 address: address,
                 timestamp: Date.now(),
                 status: "waiting"
             });
         }
 
-        const statusRef = doc(db, "history", user.email, "admin_verify", "status");
+        const statusRef = doc(db, "history", user.uid, "admin_verify", "status");
         await setDoc(statusRef, {
             is_waiting: true,
             is_confirmed: false,
             is_rejected: false,
             updatedAt: Date.now(),
             userEmail: user.email,
+            userName: finalName,
             totalBill: totalAmount,
-            deliveryAddress: address
+            deliveryAddress: address,
+            uid: user.uid
         });
 
         return true;
     } catch (e) {
-        console.error(e);
+        console.error("Lỗi gửi yêu cầu Cloud:", e);
         return false;
     }
 };
+
 onAuthStateChanged(auth, async (user) => { 
     if (!user) return;
-    const addressInput = document.getElementById("address");
     
-    try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userDocRef);
-
-        if (userSnap.exists()) {
-            const userData = userSnap.data();
-            if (userData.address && addressInput) {
-                addressInput.value = userData.address;
-            }
-        }
-    } catch (error) {
-        console.error("Lỗi lấy địa chỉ:", error);
-    }
-    const totalAmount = calculateTotal();
-    startListeningAdmin(user.email);
+    const addressInput = document.getElementById("address");
     const confirmBtn = document.getElementById("confirmed-sent");
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    if (userSnap.exists() && addressInput) {
+        addressInput.value = userSnap.data().address || "";
+    }
+    const { total, items } = await calculateTotal(user.uid);
+    startListeningAdmin(user.uid);
 
     if (confirmBtn) {
-        confirmBtn.addEventListener("click", async (e) => {
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.replaceWith(newConfirmBtn);
+
+        newConfirmBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             const addressValue = addressInput ? addressInput.value.trim() : "";
 
             if (!addressValue) {
                 alert("Please enter your delivery address!");
-                addressInput.focus();
                 return;
             }
 
-            if (totalAmount <= 0) {
-                alert("Your cart is empty!");
+            if (total <= 0) {
+                alert("Your Cloud Cart is empty!");
                 return;
             }
 
-            confirmBtn.disabled = true;
-            confirmBtn.innerText = "Processing...";
+            newConfirmBtn.disabled = true;
+            newConfirmBtn.innerText = "Processing Cloud Data...";
 
-            const success = await handleConfirmRequest(user, totalAmount, addressValue);
+            const success = await handleConfirmRequest(user, total, items, addressValue);
 
             if (!success) {
-                confirmBtn.disabled = false;
-                confirmBtn.innerText = "I have sent money.";
+                newConfirmBtn.disabled = false;
+                newConfirmBtn.innerText = "I have sent money.";
                 alert("Failed to send request.");
             }
         });

@@ -1,6 +1,6 @@
-import { auth } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-const STORAGE_KEY = 'sofa_cart_history';
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 const getAuthState = () => {
     return new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -9,90 +9,34 @@ const getAuthState = () => {
         });
     });
 };
+
 const clean = (str) => {
     if (!str) return "";
     if (typeof str !== 'string') return str;
     return str.replace(/[<>"']/g, m => ({
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
+        '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[m]));
 };
-const getCartItems = () => {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+const getCartItems = async (uid) => {
+    const cartRef = doc(db, "carts", uid);
+    const snap = await getDoc(cartRef);
+    return snap.exists() ? snap.data().items : [];
 };
 
-const saveToLocal = (item) => {
-    const items = getCartItems();
-    items.push(item);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+const saveToCloud = async (uid, items) => {
+    const cartRef = doc(db, "carts", uid);
+    await setDoc(cartRef, { items: items });
 };
-async function handleBuy(productIndex, quantityInput, errorSpan, productName, successline) {
-    const user = await getAuthState();
-    console.log("User detected:", user);
 
-    if (!user) {
-        alert("This function requires login!");
-        if (errorSpan) {
-            errorSpan.style.color = "red";
-            errorSpan.textContent = "Please login to add to cart!";
-        }
-        return;
-    }
-
-    const checkedSize = document.querySelector(`input[name="radio"]:checked`);
-    if (!checkedSize) {
-        alert("Please select a size for the product!");
-        if (errorSpan) errorSpan.textContent = "Please select a size!";
-        return;
-    } else {
-        if (errorSpan) errorSpan.textContent = "";
-    }
-    let size = "";
-    if (checkedSize.id.includes("sizes")) size = "S";
-    else if (checkedSize.id.includes("sizem")) size = "M";
-    else if (checkedSize.id.includes("sizel")) size = "L";
-
-    const priceList = {
-        "Emerald Luxe": 5000000, "Ivory Royale": 7200000, "Crimson Classic": 6500000,
-        "Champagne Elegance": 4800000, "Rosé Charm": 6000000, "Granite Moderno": 7800000,
-        "Sapphire Relaxa": 5200000, "Olive Haven": 5900000, "Pearl Serenity": 5900000,
-        "Amber Glow": 6100000, "Charcoal Grace": 7000000, "Midnight Comfort": 5700000
-    };
-
-    const basePrice = priceList[productName] || 0;
-    const newItem = {
-        Name: productName,
-        Size: size,
-        quantity: quantityInput ? parseInt(quantityInput.value) : 1,
-        Price: basePrice,
-        timestamp: Date.now()
-    };
-    // Save the item
-    saveToLocal(newItem);
-    alert("Added to cart successfully!");
-
-    if (successline) {
-        successline.style.color = "green";
-        successline.textContent = "Added to cart!";
-        setTimeout(() => { successline.textContent = ""; }, 2000);
-    }
-
-    renderCart();
-}
-
-// Show all items in cart
 export async function addToCart(productData) {
     const user = await getAuthState();
-
     if (!user) {
         alert("This function requires login!");
         return false;
     }
 
     const newItem = {
+        productId: productData.productId || productData.id,
         Name: productData.name,
         Size: productData.size || "Standard",
         quantity: parseInt(productData.quantity) || 1,
@@ -101,20 +45,29 @@ export async function addToCart(productData) {
         timestamp: Date.now()
     };
 
-    saveToLocal(newItem);
+    let items = await getCartItems(user.uid);
+    items.push(newItem);
+    await saveToCloud(user.uid, items);
+    
     alert(`Added ${productData.name} to cart!`);
-    renderCart();
+    await renderCart();
     return true;
 }
 
-export const renderCart = () => {
+export const renderCart = async () => {
     const container = document.getElementById("cont");
     const payButton = document.getElementById("redirect");
     if (!container) return;
 
-    const items = getCartItems();
-    
-    container.innerHTML = '<h3>Your Cart</h3>'; 
+    const user = await getAuthState();
+    if (!user) {
+        container.innerHTML = '<h3>Your Cart</h3><p>Please login to view cart.</p>';
+        return;
+    }
+
+    const items = await getCartItems(user.uid);
+
+    container.innerHTML = '<h3>Your Cart</h3>';
 
     if (items.length === 0) {
         if (payButton) payButton.style.display = "none";
@@ -142,22 +95,27 @@ export const renderCart = () => {
             `;
             payButton ? container.insertBefore(div, payButton) : container.appendChild(div);
         });
+
         container.querySelectorAll(".delete-btn").forEach(btn => {
-            btn.onclick = function() {
-                const idx = this.getAttribute("data-index");
-                let currentItems = getCartItems();
+            btn.onclick = async function () {
+                const idx = parseInt(this.getAttribute("data-index"));
+                let currentItems = await getCartItems(user.uid);
                 currentItems.splice(idx, 1);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(currentItems));
-                renderCart();
+                await saveToCloud(user.uid, currentItems);
+                await renderCart();
             };
         });
     }
 };
-document.addEventListener("DOMContentLoaded", () => {
-    renderCart();
-    
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await renderCart();
+
     const payButton = document.getElementById("redirect");
     if (payButton) {
-        payButton.onclick = () => window.location.href = '../html/pay-form.html';
+        // Gán lại sự kiện click để chắc chắn nó chuyển hướng
+        payButton.onclick = () => {
+            window.location.href = '../html/pay-form.html';
+        };
     }
 });

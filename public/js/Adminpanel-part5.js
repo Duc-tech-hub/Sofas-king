@@ -31,17 +31,12 @@ if (imageFileInput) {
             const result = await response.json();
 
             if (result.success) {
-                const downloadURL = result.data.url; // Direct link
-                
-                // Lưu vào input ẩn
+                const downloadURL = result.data.url; 
                 document.getElementById('p-image').value = downloadURL;
-                
-                // Hiện ảnh xem trước
                 if (preview) {
                     preview.src = downloadURL;
                     preview.style.display = "block";
                 }
-                
                 status.innerHTML = `<span class="text-success">✅ Upload Success!</span>`;
             } else {
                 throw new Error("ImgBB error: " + result.error.message);
@@ -52,6 +47,7 @@ if (imageFileInput) {
         }
     };
 }
+
 async function renderProducts(filterText = "") {
     if (!productList) return;
     
@@ -62,15 +58,33 @@ async function renderProducts(filterText = "") {
     }
 
     productList.innerHTML = "";
+    const lowStockItems = allProducts.filter(p => Number(p.Stock) <= 5);
+    if (lowStockItems.length > 0 && filterText === "") {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = "alert alert-danger border-0 shadow-sm mb-3";
+        alertDiv.innerHTML = `
+            <h6 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Warning: Out of stock (≤ 5):</h6>
+            <ul class="mb-0 small">
+                ${lowStockItems.map(p => `<li>${p.Name}: <strong>${p.Stock}</strong> left</li>`).join('')}
+            </ul>
+        `;
+        productList.appendChild(alertDiv);
+    }
     const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(filterText.toLowerCase()));
 
     filtered.forEach((p) => {
         const div = document.createElement('div');
         div.className = "item-row d-flex justify-content-between align-items-center p-2 border-bottom";
+        const isLow = Number(p.Stock) <= 5;
+        const stockStyle = isLow ? "text-danger fw-bold" : "text-muted";
+
         div.innerHTML = `
             <div class="d-flex align-items-center">
                 <input type="radio" name="prod-select" value="${p.id}" class="me-2">
-                <span><strong>${p.Name}</strong></span>
+                <div>
+                    <div><strong>${p.Name}</strong></div>
+                    <small class="${stockStyle}">Stock: ${p.Stock}</small>
+                </div>
             </div>
         `;
 
@@ -86,6 +100,7 @@ async function renderProducts(filterText = "") {
         productList.appendChild(div);
     });
 }
+
 function openEditModal(id, data) {
     document.getElementById('edit-id').value = id;
     document.getElementById('p-name').value = data.Name;
@@ -106,6 +121,7 @@ function openEditModal(id, data) {
     const modalInstance = bootstrap.Modal.getOrCreateInstance(document.getElementById('productModal'));
     modalInstance.show();
 }
+
 searchInput.addEventListener('input', (e) => renderProducts(e.target.value));
 
 btnSelect.onclick = () => {

@@ -1,118 +1,163 @@
-import { auth, db, app } from "./firebase-config.js";
-import { collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { auth, db } from "./firebase-config.js";
+import { 
+    collection, 
+    addDoc, 
+    getDocs, 
+    getDoc, 
+    doc, 
+    query, 
+    orderBy, 
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
     const form = document.querySelector("#reviewform");
     const commentList = document.querySelector("#comment-list");
     const combutton = document.querySelector("#combutton");
-    const comment = document.querySelector("#comment");
+    const commentInput = document.querySelector("#comment");
+    
+    // Dropdown elements
+    const productSelect = document.getElementById('review-product-select');
+    const ratingSelect = document.getElementById('rating-select');
+
     const error1 = document.querySelector("#errorcheckp");
     const error2 = document.querySelector("#errorstars");
     const error3 = document.querySelector("#errorcomment");
     const successline = document.querySelector("#successline");
     const nocom = document.querySelector("#nocomment");
+
     let hasComments = false;
     const pad = n => n.toString().padStart(2, '0');
-    // Load 2 newest comments (All comments are shown in comments.html)
+
     const fetchComments = async () => {
-        error1.textContent = ""; error2.textContent = ""; error3.textContent = "";
-        successline.textContent = "";
+        if (error1) error1.textContent = ""; 
+        if (error2) error2.textContent = ""; 
+        if (error3) error3.textContent = "";
         if (nocom) nocom.textContent = "";
 
         commentList.innerHTML = "";
-        const q = query(collection(db, "comments"), orderBy("date", "desc"));
-        const querySnapshot = await getDocs(q);
+        
+        try {
+            const q = query(collection(db, "comments"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-            if (nocom) nocom.textContent = "There's no comment yet.";
-            combutton.classList.remove("combutton1");
-            combutton.classList.add("combutton");
-        } else {
-            hasComments = true;
-            combutton.classList.remove("combutton");
-            combutton.classList.add("combutton1");
+            if (querySnapshot.empty) {
+                if (nocom) nocom.textContent = "There's no comment yet.";
+                combutton?.classList.replace("combutton1", "combutton");
+            } else {
+                hasComments = true;
+                combutton?.classList.replace("combutton", "combutton1");
 
-            let shown = 0;
-            querySnapshot.forEach(doc => {
-                if (shown >= 2) return;
-                const item = doc.data();
-                const d = item.date && typeof item.date.toDate === "function"
-                    ? item.date.toDate()
-                    : (item.date ? new Date(item.date) : new Date());
+                let shown = 0;
+                querySnapshot.forEach(userDoc => {
+                    if (shown >= 2) return;
+                    
+                    const item = userDoc.data();
+                    const d = item.date && typeof item.date.toDate === "function"
+                        ? item.date.toDate()
+                        : (item.date ? new Date(item.date) : new Date());
+                    
+                    let displayName = item.name || "Anonymous";
+                    if (displayName.includes("@account.com")) {
+                        displayName = displayName.split('@')[0];
+                    }
 
-                const div = document.createElement("div");
-                div.classList.add("comment");
-                div.innerHTML = `
-    <div class="author"></div>
-    <div class="date">${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}</div>
-    <div class="product"></div>
-    <div class="rating">${"⭐".repeat(Math.max(0, Math.min(5, item.stars || 0)))}</div>
-    <div class="text"></div>
-`;
-                div.querySelector(".author").textContent = item.name || "Anonymous";
-                div.querySelector(".product").textContent = `Reviewed: ${item.product || "N/A"}`;
-                div.querySelector(".text").textContent = item.text || "";
+                    const div = document.createElement("div");
+                    div.classList.add("comment");
+                    div.innerHTML = `
+                        <div class="author" style="font-weight: bold; color: #2c3e50;"></div>
+                        <div class="date" style="font-size: 0.85rem; color: #95a5a6;">
+                            ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}
+                        </div>
+                        <div class="product" style="font-style: italic; margin: 5px 0;"></div>
+                        <div class="rating">${"⭐".repeat(Math.max(0, Math.min(5, item.stars || 0)))}</div>
+                        <div class="text" style="margin-top: 8px; line-height: 1.4;"></div>
+                    `;
+                    
+                    div.querySelector(".author").textContent = displayName;
+                    div.querySelector(".product").textContent = `Reviewed: ${item.product || "N/A"}`;
+                    div.querySelector(".text").textContent = item.text || "";
 
-                commentList.appendChild(div);
-            });
+                    commentList.appendChild(div);
+                    shown++;
+                });
+            }
+        } catch (err) {
+            console.error("Lỗi khi load comment:", err);
         }
     };
 
     await fetchComments();
 
     if (combutton) {
-        combutton.style.display = "inline-block";
         combutton.addEventListener("click", (e) => {
             e.preventDefault();
-            if (hasComments === true) {
-                window.location.href = "comments.html";
-            }
+            if (hasComments) window.location.href = "comments.html";
         });
     }
 
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const selectedProduct = document.querySelector('input[name="product"]:checked');
-            const selectedStar = document.querySelector('input[name="stars"]:checked');
-
-            const currentuser = auth.currentUser ? auth.currentUser.email : "Guest";
+            const productVal = productSelect ? productSelect.value : "";
+            const ratingVal = ratingSelect ? ratingSelect.value : "";
+            const commentVal = commentInput.value.trim();
+            const wordCount = commentVal.split(/\s+/).filter(w => w.length > 0).length;
             error1.textContent = ""; error2.textContent = ""; error3.textContent = "";
             successline.textContent = "";
+            if (!productVal) {
+                error1.textContent = "Please select a product."; return;
+            }
+            if (!ratingVal) {
+                error2.textContent = "Please give a rating."; return;
+            }
+            if (commentVal === "") {
+                error3.textContent = "Please write your comment."; return;
+            }
+            if (wordCount > 200) {
+                error3.textContent = "Comment is too long (max 200 words)."; return;
+            }
 
-            const commentVal = comment.value.trim();
-            const wordCount = commentVal.split(/\s+/).filter(w => w.length > 0).length;
-            if (!selectedProduct) {
-                error1.textContent = "You have to choose a product option to review.";
-                return;
-            }
-            if (!selectedStar) {
-                error2.textContent = "You have to choose one of the star options.";
-                return;
-            }
-            if (commentVal.length === 0) {
-                error3.textContent = "You haven't written a comment yet.";
-                return;
-            }
-            if (wordCount >= 200) {
-                error3.textContent = "Your comment was too long. Under 200 words please.";
-                return;
-            }
-            // Save comments on firestore
-            const now = new Date();
-            await addDoc(collection(db, "comments"), {
-                name: currentuser,
-                date: now,
-                product: selectedProduct.value,
-                stars: parseInt(selectedStar.value),
-                text: commentVal
-            });
+            let nameToSave = "Guest";
+            const user = auth.currentUser;
 
-            successline.textContent = "Comment created successfully.";
-            comment.value = "";
-            if (selectedProduct) selectedProduct.checked = false;
-            if (selectedStar) selectedStar.checked = false;
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const email = userData.email || user.email;
+                        nameToSave = email.includes("@account.com") ? email.split('@')[0] : email;
+                    } else {
+                        nameToSave = user.email.includes("@account.com") ? user.email.split('@')[0] : user.email;
+                    }
+                } catch (err) {
+                    console.error("Lỗi lấy thông tin user:", err);
+                    nameToSave = user.email.split('@')[0];
+                }
+            }
 
-            await fetchComments();
+            try {
+                await addDoc(collection(db, "comments"), {
+                    name: nameToSave,
+                    product: productVal,
+                    stars: parseInt(ratingVal),
+                    text: commentVal,
+                    date: serverTimestamp()
+                });
+
+                successline.textContent = "Comment posted successfully!";
+                successline.style.color = "green";
+                commentInput.value = "";
+                if (productSelect) productSelect.selectedIndex = 0;
+                if (ratingSelect) ratingSelect.selectedIndex = 0;
+
+                await fetchComments();
+            } catch (err) {
+                console.error("Lỗi khi lưu comment:", err);
+                successline.textContent = "Error: Could not save comment.";
+                successline.style.color = "red";
+            }
         });
     }
 });

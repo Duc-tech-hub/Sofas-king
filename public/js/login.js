@@ -21,7 +21,7 @@ loginForm?.addEventListener("submit", async (e) => {
     const username = document.querySelector("#login-username").value.trim();
     const password = document.querySelector("#login-password").value;
     const addressValue = document.querySelector("#address").value.trim();
-    const phoneValue = document.querySelector("#phonenumber").value.trim();
+    const phoneValue = document.querySelector("#Phone_number").value.trim();
     const fakeEmail = `${username}@account.com`;
 
     try {
