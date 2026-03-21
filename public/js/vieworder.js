@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
-                    // Ưu tiên lấy field 'email' trong DB (có thể là "Duck")
                     searchIdentifier = userData.email || user.email;
                 }
 
@@ -76,9 +75,6 @@ function fetchAndRenderOrders(identifier, container, clean) {
             const order = docSnap.data();
             const status = (order.status || "Processing").toLowerCase();
             const isDelivered = status === 'delivered';
-            
-            // --- ĐÂY LÀ CHỖ QUAN TRỌNG NHẤT: PHẢI NẰM TRONG VÒNG LẶP ---
-            // Nó sẽ bới vào items[0] để tìm địa chỉ nếu bên ngoài không có
             const finalAddress = order.address || (order.items && order.items[0]?.address) || "No Address Provided";
             
             let displayDate = "Pending Date";

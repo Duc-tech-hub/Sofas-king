@@ -1,7 +1,7 @@
 import { auth } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-const ADMIN_EMAILS = ["Your_email"];
+const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com"];
 
 onAuthStateChanged(auth, (user) => {
     const navAcp = document.getElementById('nav-acp');

@@ -6,7 +6,6 @@ import {
 
 let isOrderSelectMode = false;
 
-// --- HELPER: QUICK TOAST ---
 const showToast = (message, icon = 'success') => {
     Swal.fire({
         title: message,
@@ -29,6 +28,7 @@ const clean = (str) => {
 const loadOrdersToBox = () => {
     const container = document.querySelector('#output-box-orders');
     if (!container) return;
+
     const q = query(collectionGroup(db, 'admin_verify'), where('is_waiting', '==', true));
 
     onSnapshot(q, async (snapshot) => {
@@ -39,10 +39,10 @@ const loadOrdersToBox = () => {
 
         const promises = snapshot.docs.map(async (statusDoc) => {
             const dataStatus = statusDoc.data();
-            const userRef = statusDoc.ref.parent.parent; 
-            if (!userRef) return "";
+            const userDocRef = statusDoc.ref.parent.parent;
+            if (!userDocRef) return "";
+            const uid = userDocRef.id;
 
-            const uid = userRef.id;
             const pendingSnap = await getDocs(collection(db, "history", uid, "pending_orders"));
 
             let productsHTML = "";
@@ -52,7 +52,12 @@ const loadOrdersToBox = () => {
             });
 
             const checkboxHTML = isOrderSelectMode
-                ? `<div class="check-col"><input type="checkbox" class="order-checkbox" value="${clean(uid)}" style="width:20px; height:20px;"></div>`
+                ? `<div class="check-col">
+                    <input type="checkbox" class="order-checkbox" 
+                           value="${uid}" 
+                           data-statusid="${statusDoc.id}" 
+                           style="width:20px; height:20px;">
+                   </div>`
                 : "";
 
             return `
@@ -61,7 +66,7 @@ const loadOrdersToBox = () => {
                 <div class="info-col email-section">
                     <label>CUSTOMER</label>
                     <div class="email-text"><b>${clean(dataStatus.userName || uid)}</b></div>
-                    <div style="font-size:10px; color:#999;">${uid}</div>
+                    <div style="font-size:10px; color:#999;">ID: ${uid}</div>
                 </div>
                 <div class="info-col products-section">
                     <label>ORDER DETAILS</label>
@@ -78,36 +83,27 @@ const loadOrdersToBox = () => {
     });
 };
 
-// --- ACTION: ACCEPT ORDERS (Confirm & Reduce Stock) ---
 const handleAccept = async () => {
     const selected = document.querySelectorAll('.order-checkbox:checked');
-    if (selected.length === 0) {
-        return Swal.fire('Wait!', 'Please select at least one order to accept.', 'info');
-    }
+    if (selected.length === 0) return Swal.fire('Wait!', 'Select orders to accept.', 'info');
 
     const confirmResult = await Swal.fire({
         title: 'Confirm Orders?',
-        text: `Accept and process ${selected.length} order(s)? This will reduce stock.`,
+        text: `Process ${selected.length} order(s)?`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#2ecc71',
-        confirmButtonText: 'Yes, Confirm!'
+        confirmButtonColor: '#2ecc71'
     });
 
     if (confirmResult.isConfirmed) {
         try {
-            // Show processing overlay
-            Swal.fire({
-                title: 'Processing Orders...',
-                text: 'Updating stock and moving to packing...',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
+            Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading() });
 
             for (const cb of selected) {
                 const uid = cb.value;
-                const statusRef = doc(db, "history", uid, "admin_verify", "status");
+                const statusId = cb.getAttribute('data-statusid');
                 
+                const statusRef = doc(db, "history", uid, "admin_verify", statusId);
                 const statusSnap = await getDoc(statusRef);
                 const dataStatus = statusSnap.data() || {};
 
@@ -115,95 +111,78 @@ const handleAccept = async () => {
                 const pendingSnap = await getDocs(pendingCol);
                 
                 const products = [];
+                const now = Date.now();
+
                 for (const pDoc of pendingSnap.docs) {
                     const item = pDoc.data();
-                    products.push(item);
+                    const finalItem = { ...item, timestamp: now, status: "completed" };
+                    products.push(finalItem);
 
-                    // Update Stock Logic
+                    await addDoc(collection(db, "history", uid, "buying_history"), finalItem);
+
                     if (item.productId) {
                         const productRef = doc(db, "products", item.productId);
-                        const productSnap = await getDoc(productRef);
-                        
-                        if (productSnap.exists()) {
-                            const currentStock = parseInt(productSnap.data().Stock) || 0;
-                            const buyQty = parseInt(item.quantity) || 0;
-                            const newStock = Math.max(0, currentStock - buyQty);
+                        const pSnap = await getDoc(productRef);
+                        if (pSnap.exists()) {
+                            const newStock = Math.max(0, (parseInt(pSnap.data().Stock) || 0) - (parseInt(item.quantity) || 0));
                             await updateDoc(productRef, { Stock: newStock });
                         }
                     }
-                }
-
-                if (products.length === 0) continue;
-
-                // Move to all_orders
-                await addDoc(collection(db, "all_orders"), {
-                    uid: uid,
-                    customerName: dataStatus.userName || "Customer",
-                    items: products,
-                    totalBill: dataStatus.totalBill || 0,
-                    status: "packing",
-                    createdAt: Date.now()
-                });
-
-                // Clear pending and update status
-                for (const pDoc of pendingSnap.docs) {
                     await deleteDoc(pDoc.ref);
                 }
+
+                if (products.length > 0) {
+                    await addDoc(collection(db, "all_orders"), {
+                        uid: uid,
+                        customerName: dataStatus.userName || "Customer",
+                        customerEmail: dataStatus.userEmail || "", 
+                        items: products,
+                        totalBill: dataStatus.totalBill || 0,
+                        status: "packing",
+                        createdAt: now
+                    });
+                }
+
                 await updateDoc(statusRef, { is_waiting: false, is_confirmed: true });
             }
 
-            Swal.close(); // Close loading
-            showToast("Orders accepted successfully!");
+            Swal.close();
+            showToast("Orders accepted!");
             resetMode();
-        } catch (e) { 
-            console.error("Error:", e); 
-            Swal.fire('Error', 'Failed to process some orders.', 'error');
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'Failed to process.', 'error');
         }
     }
 };
 
-// --- ACTION: DENY ORDERS ---
 const handleDeny = async () => {
     const selected = document.querySelectorAll('.order-checkbox:checked');
-    if (selected.length === 0) {
-        return Swal.fire('Wait!', 'Select orders to deny.', 'info');
-    }
+    if (selected.length === 0) return Swal.fire('Wait!', 'Select orders to deny.', 'info');
 
     const confirmDeny = await Swal.fire({
         title: 'Reject Orders?',
-        text: `Are you sure you want to deny ${selected.length} order(s)? This will clear their pending items.`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        confirmButtonText: 'Yes, Deny!'
+        confirmButtonColor: '#d33'
     });
 
     if (confirmDeny.isConfirmed) {
         try {
             Swal.fire({ title: 'Rejecting...', didOpen: () => Swal.showLoading() });
-
             for (const cb of selected) {
                 const uid = cb.value;
-                const statusRef = doc(db, "history", uid, "admin_verify", "status");
-                const pendingSnap = await getDocs(collection(db, "history", uid, "pending_orders"));
+                const statusId = cb.getAttribute('data-statusid');
+                const statusRef = doc(db, "history", uid, "admin_verify", statusId);
                 
-                for (const pDoc of pendingSnap.docs) {
-                    await deleteDoc(pDoc.ref);
-                }
+                const pendingSnap = await getDocs(collection(db, "history", uid, "pending_orders"));
+                for (const pDoc of pendingSnap.docs) await deleteDoc(pDoc.ref);
 
-                await updateDoc(statusRef, {
-                    is_waiting: false,
-                    is_confirmed: false,
-                    is_rejected: true
-                });
+                await updateDoc(statusRef, { is_waiting: false, is_rejected: true });
             }
-            
-            showToast("Orders denied and cleared.");
+            showToast("Orders denied.");
             resetMode();
-        } catch (e) {
-            console.error(e);
-            Swal.fire('Error', 'Action failed.', 'error');
-        }
+        } catch (e) { console.error(e); }
     }
 };
 
@@ -222,8 +201,8 @@ const resetMode = () => {
 selectBtn?.addEventListener('click', () => {
     isOrderSelectMode = !isOrderSelectMode;
     selectBtn.textContent = isOrderSelectMode ? "Cancel" : "Select";
-    acceptBtn.style.display = isOrderSelectMode ? "inline-block" : "none";
-    denyBtn.style.display = isOrderSelectMode ? "inline-block" : "none";
+    if (acceptBtn) acceptBtn.style.display = isOrderSelectMode ? "inline-block" : "none";
+    if (denyBtn) denyBtn.style.display = isOrderSelectMode ? "inline-block" : "none";
     loadOrdersToBox();
 });
 

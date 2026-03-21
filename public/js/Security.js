@@ -3,13 +3,13 @@ import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-
 import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app-check.js";
 
-const ADMIN_EMAILS = ["Your_email"];
+const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com"];
 
 // --- RECAPTCHA ACTIVATED ---
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider('Your_recapcha_provider'),
-    isTokenAutoRefreshEnabled: true
-});
+// const appCheck = initializeAppCheck(app, {
+//     provider: new ReCaptchaV3Provider('6LcD64osAAAAAGUBTHsgA4ohfn5pCwabUywaoemq'),
+//     isTokenAutoRefreshEnabled: true
+// });
 
 /**
  * Security check for locked accounts and admin permissions

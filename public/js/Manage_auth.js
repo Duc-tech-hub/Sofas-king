@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- GOOGLE LOGIN ---
     if (googleMethodButton) {
         googleMethodButton.addEventListener("click", () => {
-            // Hiển thị Loading
             Swal.fire({
                 title: 'Connecting to Google...',
                 allowOutsideClick: false,
@@ -47,8 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     try {
                         const userDocRef = doc(db, "users", user.uid);
                         const userDoc = await getDoc(userDocRef);
-
-                        // Trường hợp tài khoản bị khóa
                         if (userDoc.exists() && userDoc.data().is_disabled === true) {
                             await signOut(auth);
                             return Swal.fire({
