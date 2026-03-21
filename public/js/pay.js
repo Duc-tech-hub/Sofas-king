@@ -3,16 +3,19 @@ import {
     doc, setDoc, collection, addDoc, onSnapshot, getDoc, updateDoc, deleteDoc 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 const getCloudCart = async (uid) => {
     const cartRef = doc(db, "carts", uid);
     const snap = await getDoc(cartRef);
     return snap.exists() ? snap.data().items : [];
 };
+
 const resetCloudCart = async (uid) => {
     const cartRef = doc(db, "carts", uid);
-    await setDoc(cartRef, { items: [] }); // Reset mảng items về rỗng
-    console.log("Cloud Cart đã được reset.");
+    await setDoc(cartRef, { items: [] });
+    console.log("Cloud Cart has been reset.");
 };
+
 const calculateTotal = async (uid) => {
     const outputMoneyEl = document.getElementById("output_money");
     const items = await getCloudCart(uid);
@@ -50,13 +53,25 @@ const startListeningAdmin = (uid) => {
             }
             return;
         }
+
         if (data.is_confirmed === true || data.is_rejected === true) {
             await resetCloudCart(uid);
             
+            // Replaced alert with SweetAlert2 for Admin response
             if (data.is_confirmed === true) {
-                alert("Payment Successful! Your order has been placed.");
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Payment Successful!',
+                    text: 'Your order has been placed successfully.',
+                    confirmButtonColor: '#28a745'
+                });
             } else {
-                alert("Payment Rejected! Your cart has been cleared.");
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Rejected!',
+                    text: 'Your payment was not approved. Your cart has been cleared.',
+                    confirmButtonColor: '#d33'
+                });
             }
 
             if (confirmBtn) {
@@ -65,6 +80,7 @@ const startListeningAdmin = (uid) => {
                 confirmBtn.innerText = "I have sent money.";
             }
             if (note) note.style.display = "none";
+            
             await updateDoc(statusRef, {
                 is_waiting: false,
                 is_confirmed: false,
@@ -119,7 +135,7 @@ const handleConfirmRequest = async (user, totalAmount, items, address) => {
 
         return true;
     } catch (e) {
-        console.error("Lỗi gửi yêu cầu Cloud:", e);
+        console.error("Cloud Request Error:", e);
         return false;
     }
 };
@@ -130,6 +146,7 @@ onAuthStateChanged(auth, async (user) => {
     const addressInput = document.getElementById("address");
     const confirmBtn = document.getElementById("confirmed-sent");
     const userSnap = await getDoc(doc(db, "users", user.uid));
+    
     if (userSnap.exists() && addressInput) {
         addressInput.value = userSnap.data().address || "";
     }
@@ -144,13 +161,23 @@ onAuthStateChanged(auth, async (user) => {
             e.preventDefault();
             const addressValue = addressInput ? addressInput.value.trim() : "";
 
+            // Replaced alert for missing address
             if (!addressValue) {
-                alert("Please enter your delivery address!");
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Notice',
+                    text: 'Please enter your delivery address!',
+                });
                 return;
             }
 
+            // Replaced alert for empty cart
             if (total <= 0) {
-                alert("Your Cloud Cart is empty!");
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Empty Cart',
+                    text: 'Your Cloud Cart is currently empty!',
+                });
                 return;
             }
 
@@ -162,7 +189,12 @@ onAuthStateChanged(auth, async (user) => {
             if (!success) {
                 newConfirmBtn.disabled = false;
                 newConfirmBtn.innerText = "I have sent money.";
-                alert("Failed to send request.");
+                // Replaced alert for submission failure
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to send request. Please try again later.',
+                });
             }
         });
     }
