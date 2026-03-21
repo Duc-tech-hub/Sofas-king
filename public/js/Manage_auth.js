@@ -6,14 +6,9 @@ const googleProvider = new GoogleAuthProvider();
 
 document.addEventListener("DOMContentLoaded", async () => {
     const googleMethodButton = document.querySelector("#googlemethod");
-    const Search = document.querySelector("#formsearch");
-    const productsearch = document.querySelector("#product");
     const logoutbutton = document.querySelector("#logoutbutton");
-    const searchinput = document.querySelector("#search");
-    const textsearch = document.querySelector("#text");
-    const imgresult = document.querySelector("#img-result");
-    const textresult = document.querySelector("#product-result");
-    let isLoggingIn = false;
+    
+    // --- SEARCH SYSTEM LOGIC ---
     let allProducts = [];
     async function fetchProducts() {
         try {
@@ -28,9 +23,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
     await fetchProducts();
+
+    // --- GOOGLE LOGIN ---
     if (googleMethodButton) {
         googleMethodButton.addEventListener("click", () => {
-            isLoggingIn = true;
+            // Hiển thị Loading
+            Swal.fire({
+                title: 'Connecting to Google...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             signInWithPopup(auth, googleProvider)
                 .then(async (result) => {
                     const user = result.user;
@@ -43,45 +48,81 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const userDocRef = doc(db, "users", user.uid);
                         const userDoc = await getDoc(userDocRef);
 
+                        // Trường hợp tài khoản bị khóa
                         if (userDoc.exists() && userDoc.data().is_disabled === true) {
-                            alert("Your account has been locked!");
                             await signOut(auth);
-                            isLoggingIn = false;
-                            return;
+                            return Swal.fire({
+                                icon: 'error',
+                                title: 'Account Locked!',
+                                text: 'Your account has been disabled by the administrator.',
+                                confirmButtonColor: '#e74c3c'
+                            });
                         }
+
                         const updateData = {
                             email: user.email,
                             lastLogin: serverTimestamp(),
                             is_disabled: userDoc.exists() ? userDoc.data().is_disabled : false
                         };
+                        
                         if (addressValue) updateData.address = addressValue;
                         if (phoneValue) updateData.phoneNumber = phoneValue;
+
                         await setDoc(userDocRef, updateData, { merge: true });
-                        console.log("Data saved successfully!");
+
+                        // Thông báo thành công
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Login Successful',
+                            text: `Welcome, ${user.displayName}!`,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
                         window.location.href = "../html/index.html";
+
                     } catch (e) {
-                        console.error("Lỗi xử lý Firestore:", e);
-                        alert("System error occurred.");
+                        console.error("Firestore Error:", e);
+                        Swal.fire('System Error', 'Could not sync your profile data.', 'error');
                         await signOut(auth);
                     }
                 })
                 .catch((error) => {
-                    console.error("LỖI LOGIN:", error.code, error.message);
-                    alert("Login with Google failed");
-                    isLoggingIn = false;
+                    console.error("GOOGLE LOGIN ERROR:", error.code);
+                    // Đóng Loading và báo lỗi
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Failed',
+                        text: 'Google login was cancelled or failed. Please try again.',
+                        confirmButtonColor: '#3498db'
+                    });
                 });
         });
     }
+
+    // --- LOGOUT SYSTEM ---
     if (logoutbutton) {
-        logoutbutton.addEventListener("click", (e) => {
-            auth.signOut()
-                .then(() => {
-                    localStorage.clear();
-                    window.location.replace("index.html");
-                })
-                .catch((error) => {
-                    alert("Log out fail");
-                });
+        logoutbutton.addEventListener("click", async (e) => {
+            const result = await Swal.fire({
+                title: 'Logout?',
+                text: "Are you sure you want to sign out?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, Log out'
+            });
+
+            if (result.isConfirmed) {
+                auth.signOut()
+                    .then(() => {
+                        localStorage.clear();
+                        window.location.replace("index.html");
+                    })
+                    .catch((error) => {
+                        Swal.fire('Error', 'Could not sign out. Please try again.', 'error');
+                    });
+            }
         });
-    };
+    }
 });

@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 const getAuthState = () => {
     return new Promise((resolve) => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -17,6 +18,7 @@ const clean = (str) => {
         '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[m]));
 };
+
 const getCartItems = async (uid) => {
     const cartRef = doc(db, "carts", uid);
     const snap = await getDoc(cartRef);
@@ -28,10 +30,16 @@ const saveToCloud = async (uid, items) => {
     await setDoc(cartRef, { items: items });
 };
 
+// --- ACTION: ADD TO CART ---
 export async function addToCart(productData) {
     const user = await getAuthState();
     if (!user) {
-        alert("This function requires login!");
+        await Swal.fire({
+            icon: 'info',
+            title: 'Login Required',
+            text: 'Please login to add products to your cart!',
+            confirmButtonColor: '#3498db'
+        });
         return false;
     }
 
@@ -49,11 +57,14 @@ export async function addToCart(productData) {
     items.push(newItem);
     await saveToCloud(user.uid, items);
     
-    alert(`Added ${productData.name} to cart!`);
+    // REMOVED: alert(`Added ${productData.name} to cart!`);
+    // Now returns true so product-details.js can show its own Toast.
+    
     await renderCart();
     return true;
 }
 
+// --- UI: RENDER CART ---
 export const renderCart = async () => {
     const container = document.getElementById("cont");
     const payButton = document.getElementById("redirect");
@@ -61,12 +72,12 @@ export const renderCart = async () => {
 
     const user = await getAuthState();
     if (!user) {
-        container.innerHTML = '<h3>Your Cart</h3><p>Please login to view cart.</p>';
+        container.innerHTML = '<h3>Your Cart</h3><p class="text-muted">Please login to view cart.</p>';
+        if (payButton) payButton.style.display = "none";
         return;
     }
 
     const items = await getCartItems(user.uid);
-
     container.innerHTML = '<h3>Your Cart</h3>';
 
     if (items.length === 0) {
@@ -89,20 +100,46 @@ export const renderCart = async () => {
             div.innerHTML = `
                 <span>
                     <strong>${clean(item.Name)}</strong> <br>
-                    <small>${clean(item.Size)} x ${item.quantity}</small>
+                    <small class="text-muted">${clean(item.Size)} x ${item.quantity}</small>
                 </span>
-                <button class="btn btn-sm btn-danger delete-btn" data-index="${index}">X</button>
+                <button class="btn btn-sm btn-outline-danger delete-btn" data-index="${index}">
+                    <i class="bi bi-trash"></i>
+                </button>
             `;
             payButton ? container.insertBefore(div, payButton) : container.appendChild(div);
         });
 
+        // --- ACTION: DELETE ITEM ---
         container.querySelectorAll(".delete-btn").forEach(btn => {
             btn.onclick = async function () {
                 const idx = parseInt(this.getAttribute("data-index"));
-                let currentItems = await getCartItems(user.uid);
-                currentItems.splice(idx, 1);
-                await saveToCloud(user.uid, currentItems);
-                await renderCart();
+                
+                const result = await Swal.fire({
+                    title: 'Remove item?',
+                    text: "Do you want to remove this product from your cart?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, remove it!'
+                });
+
+                if (result.isConfirmed) {
+                    let currentItems = await getCartItems(user.uid);
+                    currentItems.splice(idx, 1);
+                    await saveToCloud(user.uid, currentItems);
+                    await renderCart();
+                    
+                    // Small toast for deletion
+                    Swal.fire({
+                        title: 'Removed!',
+                        icon: 'success',
+                        timer: 1000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                }
             };
         });
     }
@@ -113,7 +150,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const payButton = document.getElementById("redirect");
     if (payButton) {
-        // Gán lại sự kiện click để chắc chắn nó chuyển hướng
         payButton.onclick = () => {
             window.location.href = '../html/pay-form.html';
         };

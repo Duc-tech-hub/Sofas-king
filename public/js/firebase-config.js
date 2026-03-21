@@ -1,7 +1,7 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-const firebaseConfig = {
+ const firebaseConfig = {
   apiKey: "AIzaSy_FAKE_KEY_YOUR_API_KEY_HERE_123456",
   authDomain: "your-project-id.firebaseapp.com",
   projectId: "your-project-id",

@@ -22,19 +22,32 @@ registerForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     if (!db || !auth) {
-        alert("Error: Firebase services are not initialized. Please refresh the page!");
+        Swal.fire('Error', 'Firebase services are not initialized. Please refresh!', 'error');
         return;
     }
 
     const username = document.querySelector("#username").value.trim();
     const password = document.querySelector("#password").value;
     const confirmPassword = document.querySelector("#confirm-password").value;
-
     if (password !== confirmPassword) {
-        alert("Passwords do not match!");
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Passwords do not match!',
+            confirmButtonColor: '#3498db'
+        });
         return;
     }
+
     const fakeEmail = `${username}@account.com`;
+    Swal.fire({
+        title: 'Creating account...',
+        text: 'Please wait a moment.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, password);
@@ -48,20 +61,32 @@ registerForm?.addEventListener("submit", async (e) => {
         }, { merge: true });
 
         console.log("Firestore data saved successfully!");
-        alert("Registration successful!");
+        await Swal.fire({
+            icon: 'success',
+            title: 'Registration successful!',
+            text: 'Welcome to Kingsofas!',
+            timer: 2000,
+            showConfirmButton: false
+        });
+
         window.location.href = "../html/login.html";
 
     } catch (error) {
         console.error("Error details:", error);
-
+        let errorMsg = "System error: " + error.message;
         if (error.code === "auth/network-request-failed") {
-            alert("Network error! Please check your connection or disable VPN/Adblock.");
+            errorMsg = "Network error! Please check your connection.";
         } else if (error.code === "auth/email-already-in-use") {
-            alert("This username is already taken!");
+            errorMsg = "This username is already taken!";
         } else if (error.code === "auth/weak-password") {
-            alert("Password is too weak. Must be at least 6 characters.");
-        } else {
-            alert("System error: " + error.message);
+            errorMsg = "Password is too weak. Must be at least 6 characters.";
         }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Registration Failed',
+            text: errorMsg,
+            confirmButtonColor: '#e74c3c'
+        });
     }
 });
