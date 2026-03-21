@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const combutton = document.querySelector("#combutton");
     const commentInput = document.querySelector("#comment");
     
-    // Dropdown elements
     const productSelect = document.getElementById('review-product-select');
     const ratingSelect = document.getElementById('rating-select');
 
@@ -28,6 +27,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let hasComments = false;
     const pad = n => n.toString().padStart(2, '0');
+
+    // --- HELPER: QUICK TOAST ---
+    const showToast = (message, icon = 'success') => {
+        Swal.fire({
+            title: message,
+            icon: icon,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+    };
+
+    const checkContentSafe = async (text) => {
+        if (!text) return true;
+        const viBadWordsRegex = /địt|đm|vcl|vkl|đéo|cặc|lồn|buồi|óc chó|ngu lồn|mẹ mày|tổ sư|vãi/i;
+        if (viBadWordsRegex.test(text)) return false;
+        
+        try {
+            const response = await fetch(`https://www.purgomalum.com/service/containsprofanity?text=${encodeURIComponent(text)}`);
+            const isProfane = await response.text();
+            return isProfane !== "true";
+        } catch (err) {
+            console.error("Lọc API lỗi:", err);
+            return true;
+        }
+    };
 
     const fetchComments = async () => {
         if (error1) error1.textContent = ""; 
@@ -53,9 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (shown >= 2) return;
                     
                     const item = userDoc.data();
-                    const d = item.date && typeof item.date.toDate === "function"
-                        ? item.date.toDate()
-                        : (item.date ? new Date(item.date) : new Date());
+                    const d = item.date?.toDate ? item.date.toDate() : (item.date ? new Date(item.date) : new Date());
                     
                     let displayName = item.name || "Anonymous";
                     if (displayName.includes("@account.com")) {
@@ -65,19 +89,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const div = document.createElement("div");
                     div.classList.add("comment");
                     div.innerHTML = `
-                        <div class="author" style="font-weight: bold; color: #2c3e50;"></div>
+                        <div class="author" style="font-weight: bold; color: #2c3e50;">${displayName}</div>
                         <div class="date" style="font-size: 0.85rem; color: #95a5a6;">
                             ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}
                         </div>
-                        <div class="product" style="font-style: italic; margin: 5px 0;"></div>
+                        <div class="product" style="font-style: italic; margin: 5px 0;">Reviewed: ${item.product || "N/A"}</div>
                         <div class="rating">${"⭐".repeat(Math.max(0, Math.min(5, item.stars || 0)))}</div>
-                        <div class="text" style="margin-top: 8px; line-height: 1.4;"></div>
+                        <div class="text" style="margin-top: 8px; line-height: 1.4;">${item.text || ""}</div>
                     `;
-                    
-                    div.querySelector(".author").textContent = displayName;
-                    div.querySelector(".product").textContent = `Reviewed: ${item.product || "N/A"}`;
-                    div.querySelector(".text").textContent = item.text || "";
-
                     commentList.appendChild(div);
                     shown++;
                 });
@@ -99,44 +118,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const productVal = productSelect ? productSelect.value : "";
-            const ratingVal = ratingSelect ? ratingSelect.value : "";
+            
+            const productVal = productSelect?.value || "";
+            const ratingVal = ratingSelect?.value || "";
             const commentVal = commentInput.value.trim();
             const wordCount = commentVal.split(/\s+/).filter(w => w.length > 0).length;
-            error1.textContent = ""; error2.textContent = ""; error3.textContent = "";
-            successline.textContent = "";
-            if (!productVal) {
-                error1.textContent = "Please select a product."; return;
-            }
-            if (!ratingVal) {
-                error2.textContent = "Please give a rating."; return;
-            }
-            if (commentVal === "") {
-                error3.textContent = "Please write your comment."; return;
-            }
-            if (wordCount > 200) {
-                error3.textContent = "Comment is too long (max 200 words)."; return;
+
+            // Reset errors
+            [error1, error2, error3].forEach(el => { if(el) el.textContent = ""; });
+
+            // Validation
+            if (!productVal) { error1.textContent = "Please select a product."; return; }
+            if (!ratingVal) { error2.textContent = "Please give a rating."; return; }
+            if (commentVal === "") { error3.textContent = "Please write your comment."; return; }
+            if (wordCount > 200) { error3.textContent = "Comment is too long."; return; }
+
+            // Show Loading
+            Swal.fire({
+                title: 'Checking content...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const isSafe = await checkContentSafe(commentVal);
+            if (!isSafe) {
+                Swal.fire('Warning', 'Your content contains inappropriate language!', 'error');
+                error3.textContent = "Bad words detected!";
+                return;
             }
 
             let nameToSave = "Guest";
             const user = auth.currentUser;
-
             if (user) {
                 try {
                     const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        const email = userData.email || user.email;
-                        nameToSave = email.includes("@account.com") ? email.split('@')[0] : email;
-                    } else {
-                        nameToSave = user.email.includes("@account.com") ? user.email.split('@')[0] : user.email;
-                    }
+                    const userData = userDoc.exists() ? userDoc.data() : null;
+                    const email = userData?.email || user.email;
+                    nameToSave = email.includes("@account.com") ? email.split('@')[0] : email;
                 } catch (err) {
-                    console.error("Lỗi lấy thông tin user:", err);
                     nameToSave = user.email.split('@')[0];
                 }
             }
 
+            // Save to Firestore
             try {
                 await addDoc(collection(db, "comments"), {
                     name: nameToSave,
@@ -146,17 +170,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                     date: serverTimestamp()
                 });
 
-                successline.textContent = "Comment posted successfully!";
-                successline.style.color = "green";
+                // Success notification
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Posted!',
+                    text: 'Thank you for your review.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                // Clear form
                 commentInput.value = "";
                 if (productSelect) productSelect.selectedIndex = 0;
                 if (ratingSelect) ratingSelect.selectedIndex = 0;
 
                 await fetchComments();
             } catch (err) {
-                console.error("Lỗi khi lưu comment:", err);
-                successline.textContent = "Error: Could not save comment.";
-                successline.style.color = "red";
+                console.error("Lưu lỗi:", err);
+                Swal.fire('Error', 'Could not post comment. Try again.', 'error');
             }
         });
     }

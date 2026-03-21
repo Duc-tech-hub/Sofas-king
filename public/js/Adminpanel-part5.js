@@ -10,6 +10,19 @@ const searchInput = document.getElementById('search-product');
 let allProducts = [];
 const imageFileInput = document.getElementById('p-image-file');
 
+// --- HELPER: QUICK TOAST ---
+const showToast = (message, icon = 'success') => {
+    Swal.fire({
+        title: message,
+        icon: icon,
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+};
+
+// --- IMAGE UPLOAD LOGIC ---
 if (imageFileInput) {
     imageFileInput.onchange = async (e) => {
         const file = e.target.files[0];
@@ -17,7 +30,10 @@ if (imageFileInput) {
 
         const status = document.getElementById('upload-status');
         const preview = document.getElementById('img-preview');
-        status.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading to ImgBB...';
+        
+        // Dùng SWAL để báo đang upload thay vì text thuần
+        status.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
+        
         const formData = new FormData();
         formData.append("image", file);
         const API_KEY = "Your_ImageBB_API_KEY"; 
@@ -38,16 +54,18 @@ if (imageFileInput) {
                     preview.style.display = "block";
                 }
                 status.innerHTML = `<span class="text-success">✅ Upload Success!</span>`;
+                showToast("Image uploaded!");
             } else {
-                throw new Error("ImgBB error: " + result.error.message);
+                throw new Error(result.error.message);
             }
         } catch (error) {
-            status.innerHTML = `<span class="text-danger">❌ Error: ${error.message}</span>`;
-            console.error("Upload failed:", error);
+            status.innerHTML = `<span class="text-danger">❌ Error</span>`;
+            Swal.fire('Upload Failed', error.message, 'error');
         }
     };
 }
 
+// --- RENDER PRODUCTS ---
 async function renderProducts(filterText = "") {
     if (!productList) return;
     
@@ -59,17 +77,20 @@ async function renderProducts(filterText = "") {
 
     productList.innerHTML = "";
     const lowStockItems = allProducts.filter(p => Number(p.Stock) <= 5);
+
+    // Cảnh báo hết hàng
     if (lowStockItems.length > 0 && filterText === "") {
         const alertDiv = document.createElement('div');
         alertDiv.className = "alert alert-danger border-0 shadow-sm mb-3";
         alertDiv.innerHTML = `
-            <h6 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Warning: Out of stock (≤ 5):</h6>
+            <h6 class="fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Warning: Low Stock (≤ 5):</h6>
             <ul class="mb-0 small">
                 ${lowStockItems.map(p => `<li>${p.Name}: <strong>${p.Stock}</strong> left</li>`).join('')}
             </ul>
         `;
         productList.appendChild(alertDiv);
     }
+
     const filtered = allProducts.filter(p => p.Name.toLowerCase().includes(filterText.toLowerCase()));
 
     filtered.forEach((p) => {
@@ -129,22 +150,35 @@ btnSelect.onclick = () => {
     btnDelete.style.display = btnDelete.classList.contains('button-hide') ? "none" : "inline-block";
 };
 
+// --- ACTION: DELETE PRODUCT ---
 btnDelete.onclick = async () => {
     const checked = document.querySelector('input[name="prod-select"]:checked');
-    if (!checked) return alert("Please select a product first!");
+    if (!checked) return Swal.fire('Selection Required', 'Please select a product to delete.', 'info');
 
-    if (confirm("Permanently delete this product?")) {
+    const result = await Swal.fire({
+        title: 'Delete Product?',
+        text: "This action will permanently remove the item from your store.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, Delete it!'
+    });
+
+    if (result.isConfirmed) {
         try {
+            Swal.fire({ title: 'Deleting...', didOpen: () => Swal.showLoading() });
             await deleteDoc(doc(db, "products", checked.value));
-            alert("Deleted successfully!");
+            
+            showToast("Product deleted");
             allProducts = []; 
             renderProducts();
         } catch (err) {
-            alert("Error: " + err.message);
+            Swal.fire('Error', err.message, 'error');
         }
     }
 };
 
+// --- ACTION: ADD/UPDATE PRODUCT ---
 productForm.onsubmit = async (e) => {
     e.preventDefault();
     const id = document.getElementById('edit-id').value;
@@ -157,20 +191,27 @@ productForm.onsubmit = async (e) => {
     };
 
     try {
+        Swal.fire({ title: 'Saving...', didOpen: () => Swal.showLoading() });
+
         if (id) {
             await updateDoc(doc(db, "products", id), data);
-            alert("Updated successfully!");
+            showToast("Updated successfully!");
         } else {
             await addDoc(collection(db, "products"), data);
-            alert("Added successfully!");
+            showToast("Added to store!");
         }
+        
         productForm.reset();
         document.getElementById('img-preview').style.display = "none";
-        bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+        
+        const modalEl = document.getElementById('productModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+        
         allProducts = [];
         renderProducts();
     } catch (err) {
-        alert("Error: " + err.message);
+        Swal.fire('Error', err.message, 'error');
     }
 };
 

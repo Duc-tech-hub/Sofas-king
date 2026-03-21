@@ -9,7 +9,19 @@ import {
 let isSelectMode = false;
 let users = [];
 
-// Output: show users and their last login, show their status(islocked or not)
+// --- HELPER: SWEETALERT2 TOAST (Quick notification) ---
+const showToast = (message, icon = 'success') => {
+    Swal.fire({
+        title: message,
+        icon: icon,
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+};
+
+// Output: show users and their status
 const loadUsersToBox = () => {
     const container = document.querySelector('#output-box-accouts');
     if (!container) return;
@@ -23,6 +35,7 @@ const loadUsersToBox = () => {
             users.push(user.email);
 
             const userBox = document.createElement("div");
+            userBox.className = "user-item-box"; 
             userBox.style.cssText = `
                 border: 1px solid #ccc; 
                 padding: 15px; 
@@ -37,34 +50,28 @@ const loadUsersToBox = () => {
             const checkboxHTML = isSelectMode
                 ? `<input type="checkbox" class="user-checkbox" value="${userDoc.id}" style="width: 20px; height: 20px; margin-right: 15px; cursor: pointer;">`
                 : "";
+            
             userBox.innerHTML = `
                 <div style="display: flex; align-items: center; padding: 5px;">
                     ${checkboxHTML} 
                     <div>
-                        <strong class="user-email" style="display: block; color: #2c3e50; margin-bottom: 5px;"></strong>
+                        <strong class="user-email" style="display: block; color: #2c3e50; margin-bottom: 5px;">${user.email}</strong>
                         <p class="user-status" style="margin: 0; font-size: 0.8rem;"></p>
                     </div>
                 </div>
             `;
-            const emailEl = userBox.querySelector(".user-email");
+
             const statusEl = userBox.querySelector(".user-status");
-
-            emailEl.textContent = user.email;
-
             if (user.is_disabled) {
                 statusEl.textContent = "🚫 Account Disabled";
                 statusEl.style.color = "red";
             } else {
                 let displayTime = "Never";
-
                 if (user.lastLogin) {
-                    if (typeof user.lastLogin.toDate === 'function') {
-                        displayTime = user.lastLogin.toDate().toLocaleString('vi-VN');
-                    } else {
-                        displayTime = user.lastLogin;
-                    }
+                    displayTime = typeof user.lastLogin.toDate === 'function' 
+                        ? user.lastLogin.toDate().toLocaleString('vi-VN') 
+                        : user.lastLogin;
                 }
-
                 statusEl.textContent = `Last login: ${displayTime}`;
                 statusEl.style.color = "#666";
             }
@@ -74,38 +81,27 @@ const loadUsersToBox = () => {
     });
 };
 
-// Search account (Submit form)
+// --- SEARCH LOGIC ---
+const handleSearch = (keyword) => {
+    const container = document.querySelector('#output-box-accouts');
+    const boxes = container.querySelectorAll('.user-item-box');
+
+    boxes.forEach((box) => {
+        const email = box.querySelector('.user-email').textContent.toLowerCase();
+        box.style.display = email.includes(keyword.toLowerCase()) ? "inline-block" : "none";
+    });
+};
+
 document.querySelector('#form-account').addEventListener('submit', (e) => {
     e.preventDefault();
-    const keyword = document.querySelector('#search-account').value.toLowerCase().trim();
-    const container = document.querySelector('#output-box-accouts');
-    const userBoxes = container.querySelectorAll('.user-email');
-
-    userBoxes.forEach((emailTag) => {
-        const box = emailTag.closest('div[style*="border: 1px solid"]');
-        if (box) {
-            const emailValue = emailTag.textContent.toLowerCase();
-            box.style.display = emailValue.includes(keyword) ? "inline-block" : "none";
-        }
-    });
+    handleSearch(document.querySelector('#search-account').value);
 });
 
-// Search account (Realtime input)
 document.querySelector('#search-account').addEventListener('input', (e) => {
-    const keyword = e.target.value.toLowerCase().trim();
-    const container = document.querySelector('#output-box-accouts');
-    const userBoxes = container.querySelectorAll('.user-email');
-
-    userBoxes.forEach((emailTag) => {
-        const box = emailTag.closest('div[style*="border: 1px solid"]');
-        if (box) {
-            const emailValue = emailTag.textContent.toLowerCase();
-            box.style.display = emailValue.includes(keyword) ? "inline-block" : "none";
-        }
-    });
+    handleSearch(e.target.value);
 });
 
-// Select Mode Toggle
+// --- TOGGLE SELECT MODE ---
 document.querySelector('#select-account').addEventListener('click', (e) => {
     isSelectMode = !isSelectMode;
     const disableBtn = document.querySelector('#disable-account');
@@ -118,38 +114,71 @@ document.querySelector('#select-account').addEventListener('click', (e) => {
     loadUsersToBox();
 });
 
-// Lock accounts
+// --- ACTION: LOCK ACCOUNTS ---
 document.querySelector('#disable-account').addEventListener('click', async () => {
-    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-    if (selectedCheckboxes.length === 0) return alert("You have to choose an account");
+    const selected = document.querySelectorAll('.user-checkbox:checked');
+    
+    if (selected.length === 0) {
+        return Swal.fire('Action Required', 'Please select at least one account to lock.', 'warning');
+    }
 
-    if (confirm(`Are you sure you want to lock ${selectedCheckboxes.length} account(s)?`)) {
+    const confirmResult = await Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to lock ${selected.length} account(s)?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, lock them!'
+    });
+
+    if (confirmResult.isConfirmed) {
         try {
-            for (const cb of selectedCheckboxes) {
+            Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading() });
+            
+            for (const cb of selected) {
                 await updateDoc(doc(db, "users", cb.value), { is_disabled: true });
             }
-            alert("Lock successfully");
+            
+            showToast('Accounts locked successfully');
             resetSelectMode();
         } catch (error) {
-            console.error("Error disabling:", error);
+            console.error(error);
+            Swal.fire('Error', 'Failed to lock accounts.', 'error');
         }
     }
 });
 
-// Unlock accounts
+// --- ACTION: UNLOCK ACCOUNTS ---
 document.querySelector('#enable-account').addEventListener('click', async () => {
-    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-    if (selectedCheckboxes.length === 0) return alert("You have to choose an account");
+    const selected = document.querySelectorAll('.user-checkbox:checked');
+    
+    if (selected.length === 0) {
+        return Swal.fire('Action Required', 'Please select at least one account to unlock.', 'warning');
+    }
 
-    if (confirm(`Unlock ${selectedCheckboxes.length} account(s)?`)) {
+    const confirmResult = await Swal.fire({
+        title: 'Unlock Accounts?',
+        text: `Enable access for ${selected.length} account(s)?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'Yes, unlock!'
+    });
+
+    if (confirmResult.isConfirmed) {
         try {
-            for (const cb of selectedCheckboxes) {
+            Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading() });
+
+            for (const cb of selected) {
                 await updateDoc(doc(db, "users", cb.value), { is_disabled: false });
             }
-            alert("Unlock successfully!");
+
+            showToast('Accounts unlocked successfully');
             resetSelectMode();
         } catch (error) {
-            console.error("Error enabling:", error);
+            console.error(error);
+            Swal.fire('Error', 'Failed to unlock accounts.', 'error');
         }
     }
 });

@@ -2,6 +2,19 @@ import { db } from './firebase-config.js';
 import { collection, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 let isSelectModeComment = false;
+
+// --- HELPER: QUICK TOAST ---
+const showToast = (message, icon = 'success') => {
+    Swal.fire({
+        title: message,
+        icon: icon,
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+};
+
 const clean = (str) => {
     if (!str) return "";
     if (typeof str !== 'string') return str;
@@ -12,6 +25,7 @@ const clean = (str) => {
         "'": '&#39;'
     }[m]));
 };
+
 // Show all comments getting from firestore
 const loadComments = () => {
     const container = document.querySelector('#output-box-comments');
@@ -36,20 +50,20 @@ const loadComments = () => {
             `;
 
             const checkboxHTML = isSelectModeComment
-                ? `<input type="checkbox" class="comment-checkbox" value="${commentId}" style="margin-right: 10px;">`
+                ? `<input type="checkbox" class="comment-checkbox" value="${commentId}" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">`
                 : "";
 
             div.innerHTML = `
-    <div style="display: flex; align-items: flex-start;">
-        ${checkboxHTML}
-        <div>
-            <strong style="color: #2c3e50;">${clean(data.name)}</strong>
-            <p style="margin: 5px 0; font-size: 0.9rem;">${clean(data.text)}</p>
-            <small style="color: #999;">Product: ${clean(data.product)}</small><br>
-            <small style="color: #c2c05cff;">Stars: ${data.stars}</small>
-        </div>
-    </div>
-`;
+                <div style="display: flex; align-items: flex-start;">
+                    ${checkboxHTML}
+                    <div>
+                        <strong style="color: #2c3e50;">${clean(data.name)}</strong>
+                        <p style="margin: 5px 0; font-size: 0.9rem;">${clean(data.text)}</p>
+                        <small style="color: #999;">Product: ${clean(data.product)}</small><br>
+                        <small style="color: #c2c05cff;">Stars: ${data.stars}</small>
+                    </div>
+                </div>
+            `;
             container.appendChild(div);
         });
     });
@@ -68,27 +82,48 @@ document.querySelector('#select-comment').addEventListener('click', (e) => {
     }
     loadComments();
 });
-// Delete comments
+
+// Action: Delete comments
 document.querySelector('#remove-comment').addEventListener('click', async () => {
     const selected = document.querySelectorAll('.comment-checkbox:checked');
 
     if (selected.length === 0) {
-        alert("Please select at least one comment to remove.");
-        return;
+        return Swal.fire('No Selection', 'Please select at least one comment to remove.', 'info');
     }
 
-    if (confirm(`Are you sure you want to delete ${selected.length} comment(s)?`)) {
+    // Replace browser confirm with SweetAlert2
+    const confirmDelete = await Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to delete ${selected.length} comment(s). This cannot be undone!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete anyway!'
+    });
+
+    if (confirmDelete.isConfirmed) {
         try {
+            // Show loading overlay
+            Swal.fire({
+                title: 'Deleting...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             for (const cb of selected) {
                 await deleteDoc(doc(db, "comments", cb.value));
             }
-            alert("Deleted successfully!");
+
+            showToast('Deleted successfully!');
             resetCommentMode();
         } catch (error) {
             console.error("Error removing comments: ", error);
+            Swal.fire('Error', 'Something went wrong while deleting.', 'error');
         }
     }
 });
+
 // Search for comments
 document.querySelector('#search-comment').addEventListener('input', (e) => {
     const keyword = e.target.value.toLowerCase().trim();
@@ -102,8 +137,12 @@ document.querySelector('#search-comment').addEventListener('input', (e) => {
 
 function resetCommentMode() {
     isSelectModeComment = false;
-    document.querySelector('#select-comment').textContent = "Select";
-    document.querySelector('#remove-comment').style.display = "none";
+    const selectBtn = document.querySelector('#select-comment');
+    const removeBtn = document.querySelector('#remove-comment');
+    
+    if (selectBtn) selectBtn.textContent = "Select";
+    if (removeBtn) removeBtn.style.display = "none";
     loadComments();
 }
+
 loadComments();

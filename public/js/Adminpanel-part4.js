@@ -8,7 +8,19 @@ const completeShippingBtn = document.getElementById('complete-shipping');
 const deleteShippingBtn = document.getElementById('delete-shipping');
 let isShippingSelectMode = false;
 
-// 1. Xử lý bật/tắt chế độ chọn nhiều (Select Mode)
+// --- HELPER: QUICK TOAST ---
+const showToast = (message, icon = 'success') => {
+    Swal.fire({
+        title: message,
+        icon: icon,
+        timer: 1500,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+};
+
+// 1. Select Mode Toggle
 if (selectShippingBtn) {
     selectShippingBtn.addEventListener('click', () => {
         isShippingSelectMode = !isShippingSelectMode;
@@ -24,7 +36,7 @@ if (selectShippingBtn) {
     });
 }
 
-// 2. Hàm Load Dashboard (Realtime với onSnapshot)
+// 2. Load Dashboard Logic
 const loadShippingDashboard = () => {
     const container = document.getElementById('shipping-container');
     const totalCountEl = document.getElementById('total-orders-count');
@@ -42,15 +54,11 @@ const loadShippingDashboard = () => {
             const docId = docSnap.id;
             const currentStatus = (order.status || "").toLowerCase();
             
-            // --- FIX LỖI HIỂN THỊ TÊN (Ưu tiên customerName) ---
             const customerDisplayName = order.customerName || order.name || order.customerEmail || 'Guest';
-            
-            // Logic lấy thông tin liên hệ (Ưu tiên thông tin đơn hàng trước, item sau)
             const firstItem = (order.items && order.items.length > 0) ? order.items[0] : {};
             const finalAddress = order.address || order.deliveryAddress || firstItem.address || 'No address provided';
             const finalPhone = order.phoneNumber || order.customerPhone || firstItem.phoneNumber || 'No phone number provided';
 
-            // Tính tổng tiền đơn hàng
             const finalTotal = order.items ? order.items.reduce((sum, item) => {
                 return sum + (Number(item.Price) || 0) * (Number(item.quantity) || 1);
             }, 0) : 0;
@@ -68,7 +76,7 @@ const loadShippingDashboard = () => {
                     <div class="order-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h4 style="margin: 0; font-size: 1rem; color: #333;">ID: #${order.orderId || docId.slice(0, 8)}</h4>
                         <span style="background: ${currentStatus === 'delivered' ? '#d4edda' : '#fff3cd'}; color: ${currentStatus === 'delivered' ? '#155724' : '#856404'}; padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
-                            ${order.status || 'Pending'}
+                             ${order.status || 'Pending'}
                         </span>
                     </div>
 
@@ -99,73 +107,99 @@ const loadShippingDashboard = () => {
             `;
         });
 
-        container.innerHTML = tempHTML || '<div style="text-align:center; padding:50px; color: #999;"><h3>No orders found</h3><p>Orders will appear here once customers checkout.</p></div>';
+        container.innerHTML = tempHTML || '<div style="text-align:center; padding:50px; color: #999;"><h3>No orders found</h3></div>';
 
         if (totalCountEl) totalCountEl.innerText = totalOrders;
         if (pendingCountEl) pendingCountEl.innerText = pendingDeliveryCount;
     });
 };
 
-// 3. Chuyển trạng thái đơn lẻ
+// 3. Mark Single as Delivered
 window.markAsDelivered = async (id) => {
-    if (!confirm("Confirm delivery for this order?")) return;
-    try {
-        const orderRef = doc(db, "all_orders", id);
-        await updateDoc(orderRef, {
-            status: "Delivered",
-            deliveredAt: Date.now()
-        });
-    } catch (e) {
-        console.error("Error updating order:", e);
-        alert("Update failed: " + e.message);
+    const result = await Swal.fire({
+        title: 'Confirm Delivery?',
+        text: "Did this order reach the customer?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'Yes, Delivered!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const orderRef = doc(db, "all_orders", id);
+            await updateDoc(orderRef, {
+                status: "Delivered",
+                deliveredAt: Date.now()
+            });
+            showToast("Order status updated!");
+        } catch (e) {
+            Swal.fire('Error', e.message, 'error');
+        }
     }
 };
 
-// 4. Chuyển trạng thái hàng loạt
+// 4. Batch Mark as Delivered
 if (completeShippingBtn) {
     completeShippingBtn.addEventListener('click', async () => {
         const selected = document.querySelectorAll('.shipping-checkbox:checked');
-        if (selected.length === 0) return alert("Please select at least one order!");
+        if (selected.length === 0) return Swal.fire('Wait!', 'Select at least one order.', 'info');
         
-        if (!confirm(`Mark ${selected.length} orders as Delivered?`)) return;
+        const confirmResult = await Swal.fire({
+            title: 'Batch Update?',
+            text: `Mark ${selected.length} orders as Delivered?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Confirm All'
+        });
 
-        try {
-            for (const cb of selected) {
-                await updateDoc(doc(db, "all_orders", cb.value), { 
-                    status: "Delivered", 
-                    deliveredAt: Date.now() 
-                });
+        if (confirmResult.isConfirmed) {
+            try {
+                Swal.fire({ title: 'Updating...', didOpen: () => Swal.showLoading() });
+                for (const cb of selected) {
+                    await updateDoc(doc(db, "all_orders", cb.value), { 
+                        status: "Delivered", 
+                        deliveredAt: Date.now() 
+                    });
+                }
+                showToast("All selected orders updated!");
+                if (isShippingSelectMode) selectShippingBtn.click();
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
             }
-            alert("Updated successfully!");
-            if (isShippingSelectMode) selectShippingBtn.click(); // Tắt chế độ chọn
-        } catch (error) {
-            alert("Error updating orders: " + error.message);
         }
     });
 }
 
-// 5. Xóa đơn hàng hàng loạt
+// 5. Batch Delete Orders
 if (deleteShippingBtn) {
     deleteShippingBtn.addEventListener('click', async () => {
         const selected = document.querySelectorAll('.shipping-checkbox:checked');
-        if (selected.length === 0) return alert("Please select at least one order to remove!");
+        if (selected.length === 0) return Swal.fire('Wait!', 'Select orders to delete.', 'info');
 
-        const confirmDelete = confirm(`WARNING: Are you sure you want to PERMANENTLY delete ${selected.length} order(s)? This cannot be undone.`);
+        const confirmDelete = await Swal.fire({
+            title: 'PERMANENT DELETE?',
+            text: `You are about to delete ${selected.length} order(s). This action cannot be undone!`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Delete Permanently'
+        });
 
-        if (confirmDelete) {
+        if (confirmDelete.isConfirmed) {
             try {
+                Swal.fire({ title: 'Deleting...', didOpen: () => Swal.showLoading() });
                 for (const cb of selected) {
                     await deleteDoc(doc(db, "all_orders", cb.value));
                 }
-                alert("Orders deleted successfully!");
+                showToast("Orders removed from database.");
                 if (isShippingSelectMode) selectShippingBtn.click();
             } catch (error) {
-                console.error(error);
-                alert("Failed to delete orders.");
+                Swal.fire('Error', 'Failed to delete orders.', 'error');
             }
         }
     });
 }
 
-// Khởi chạy
 loadShippingDashboard();

@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const addressInp = document.getElementById('address');
@@ -25,27 +25,47 @@ onAuthStateChanged(auth, async (user) => {
                 if (phoneInp) phoneInp.value = data.phoneNumber || "";
             }
         } catch (error) {
-            console.error("Lỗi lấy data:", error);
+            console.error("Error fetching data:", error);
         }
     } else {
         if (usernameDisplay) usernameDisplay.textContent = "Guest";
     }
 });
-
-updateBtn.addEventListener('click', async () => {
+updateBtn?.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;
-
+    
+    const originalText = updateBtn.innerText;
     updateBtn.innerText = "Saving...";
+    updateBtn.disabled = true;
+
     try {
-        await updateDoc(doc(db, "users", user.uid), {
+        const updateData = {
             address: addressInp.value.trim(),
             phoneNumber: phoneInp.value.trim()
+        };
+
+        await updateDoc(doc(db, "users", user.uid), updateData);
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Updated!',
+            text: 'Your profile is now up to date.',
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
         });
-        alert("Your info has been updated!");
+
     } catch (e) {
-        alert("Error: " + e.message);
+        console.error("Update error:", e);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong: ' + e.message
+        });
     } finally {
-        updateBtn.innerText = "Update Info";
+        updateBtn.innerText = originalText;
+        updateBtn.disabled = false;
     }
 });
