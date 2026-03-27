@@ -6,7 +6,7 @@ I developed Sofas king as a high-performance, full-stack e-commerce platform fea
 
 ### Project Demo
 ### Video:
-> https:www.youtube.comwatch?v=b0VkqCjfRXE
+> www.youtube.comwatch?v=b0VkqCjfRXE
 ### Link website:
 > https://duc-tech-hub.github.io/Sofas-king-Demo
 ### Link dev.to post:
