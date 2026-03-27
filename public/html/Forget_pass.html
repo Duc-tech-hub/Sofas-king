@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="../css/forget_pass.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="forget-container">
+        <a href="login.html" class="back-btn"><i class="bi bi-arrow-left"></i> Back to Login</a>
+        
+        <div class="forget-card">
+            <div class="icon-header">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h2>Email-link login</h2>
+            <p class="desc">Enter your email to receive an email link via your recovery email.</p>
+
+            <form id="forget-form">
+                <div class="input-group">
+                    <label>Email</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-person"></i>
+                        <input type="text" id="forget-username" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <button type="submit" id="btn-reset" class="btn-primary">Send Reset Link</button>
+            </form>
+
+            <div id="success-msg" class="hidden text-center mt-4">
+                <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <h3>Check your Email!</h3>
+                <p>A reset link has been sent to your registered recovery email.</p>
+                <button onclick="window.location.href='login.html'" class="btn-secondary">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/Forget_pass.js"></script>
+</body>
+</html>

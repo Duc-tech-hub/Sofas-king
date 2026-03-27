@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <a aria-label="Go back" class="btn btn-secondary position-absolute top-0 start-0 m-3" href="index.html">
+        <i class="bi bi-chevron-left"></i>
+    </a>
+    <div class="login-container">
+        <form id="login-form" class="login-form">
+            <h2>Login</h2>
+            <p class="subtitle">Welcome back! Please enter your details.</p>
+
+            <div class="input-group">
+                <label for="login-username">Email</label>
+                <input type="email" id="login-username" placeholder="Enter your Email" required>
+            </div>
+
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="login-password" placeholder="Enter your password" required
+                        class="form-control">
+                    <i class="bi bi-eye-slash btn-toggle-login" data-target="login-password"></i>
+                </div>
+
+                <div class="forgot-pass-container">
+                    <a href="Forget_pass.html" class="forgot-link">Forgot password?</a>
+                </div>
+            </div>
+            <div class="address-group">
+                <label id="title-address">Address:</label>
+                <input id="address" class="address-field" type="text" placeholder="Enter your address">
+                <div id="address-suggestions" class="suggestions-container"></div>
+            </div>
+            <div class="input-group">
+                <label for="Phone_number">Your phone number:</label>
+                <input type="tel" id="Phone_number" placeholder="Provide your phone number here">
+            </div>
+
+            <button type="submit" class="btn-login" id="btn-login">Sign In</button>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <a href="login-google.html" id="google-login" class="btn-google-link">
+                <img src="../image/Logogoogle.jpg" alt="Google Logo">
+                Sign in with Google
+            </a>
+
+            <p class="redirect-link">
+                Don't have an account? <a href="register.html">Register now</a>
+            </p>
+        </form>
+        <script type="module" src="../js/login.js"></script>
+        <script type="module" src="../js/API.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=6LcD64osAAAAAGUBTHsgA4ohfn5pCwabUywaoemq"></script>
+    </div>
+</body>
+
+</html>
