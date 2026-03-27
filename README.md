@@ -1,18 +1,18 @@
-# # # 🛋️ Sofas King - Premium E-Commerce Solution
+# 🛋️ Sofas King - Premium E-Commerce Solution
 
 I developed Sofas king as a high-performance, full-stack e-commerce platform featuring a modular architecture of 70 files. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
 
 ---
 
-# # # Project Demo
-# # # Video:
+# Project Demo
+# Video:
 > https:www.youtube.comwatch?v=b0VkqCjfRXE
-# # # Link website:
+# Link website:
 > https:duc-tech-hub.github.ioSofas-king-Demo
 
 ---
 
-# # # AI-Powered Development (AI Collaboration)
+# AI-Powered Development (AI Collaboration)
 I effectively leveraged Generative AI (Gemini) as a core part of my development workflow to build and refine this project:
 
 * Code Generation: I worked with AI to write and structure complex JavaScript modules and Firebase integration logic.
@@ -20,29 +20,29 @@ I effectively leveraged Generative AI (Gemini) as a core part of my development 
 * Logic Refactoring: AI helped me optimize Firestore queries and local storage synchronization for better performance.
 * Security Auditing: AI assisted in drafting and testing the Firestore Security Rules to ensure data integrity.
 
-# # # Social Good & Community Impact
+# Social Good & Community Impact
 
 * Supporting Local Artisans: I designed this platform to be lightweight and easy to deploy, specifically aiming to help local furniture makers who lack technical resources.
 * Reducing Digital Barriers: By optimizing for high-speed performance and offline resilience, the app remains functional in areas with unstable internet.
 * Promoting Transparent Commerce: Real-time tracking systems foster trust between sellers and buyers.
 * Educational Open-Source: Structured to serve as a learning resource for full-stack development.
 
-# # # Key Features
+# Key Features
 
-# # # Customer Experience
+# Customer Experience
 * Smart Shopping Cart: Optimized using LocalStorage for sub-millisecond persistence.
 * High-quality design: Fully responsive on all devices.
 * Secure Transactional Flow: Multi-step checkout with Google Re-authentication.
 * Order Tracking: Real-time updates via Firestore listeners.
 
-# # # Administrative Control
+# Administrative Control
 * Live Dashboard: Real-time monitoring of orders, users, and comments.
 * Access Management: Instant account locking to mitigate fraud.
 * Business Logic Automation: Automated data migration process.
 
 ---
 
-# # # Technologies Used
+# Technologies Used
 
 * Frontend: HTML5, CSS3, JavaScript.
 * BaaS: Firebase (Auth, Firestore).
@@ -51,15 +51,15 @@ I effectively leveraged Generative AI (Gemini) as a core part of my development 
 
 ---
 
-# # # System Architecture & Data Flow
+# System Architecture & Data Flow
 
-# # # 1. Client-Side Persistence
+# 1. Client-Side Persistence
 Zero lag by capturing interactions in LocalStorage first.
 
-# # # 2. Event-Driven Real-time Sync
+# 2. Event-Driven Real-time Sync
 Admin actions reflect on Client UI instantly via Firestore listeners.
 
-# # # 3. Instant History Logging
+# 3. Instant History Logging
 Transactions record immediately upon purchase for transparency.
 
 graph TD
@@ -69,20 +69,20 @@ B -->|Checkout| C{Auth}
 C -->D[Firestore]
 end
 
-# # # 🧠 Technical Deep Dive
+# 🧠 Technical Deep Dive
 
-# # # # 1. Managing Complexity
+# 1. Managing Complexity
 I adopted an ES6 Module architecture to isolate functionality across 70 files.
 
-# # # # 2. Balancing Real-time vs Efficiency
+# 2. Balancing Real-time vs Efficiency
 Hybrid fetching strategy: onSnapshot for order tracking, and standard fetch for admin tasks.
 
-# # # # 3. Customer-Centric Data
+# 3. Customer-Centric Data
 Purchase records commit instantly to ensure transparency.
 
 ---
 
-# # # Project Structure
+### Project Structure
 
 * html: 25 pages.
 * js: Security.js, Adminpanel.js, cart.js.
@@ -90,7 +90,7 @@ Purchase records commit instantly to ensure transparency.
 
 ---
 
-# # # Security Standards & Firebase Rules
+### Security Standards & Firebase Rules
 
 1. Data Isolated.
 2. Role-Based Access.
@@ -98,10 +98,10 @@ Purchase records commit instantly to ensure transparency.
 
 ---
 
-# # # 🌟 Community Recognition
+### 🌟 Community Recognition
 
 * Sandeep Vashishtha (GitHub Star).
 * Rhythm Pahwa (Fullstack Expert).
 
-# # Developed by duck.sssop0356@gmail.com
-# # I am a 14-year-old developer passionate about building secure web solutions.
+## Developed by duck.sssop0356@gmail.com
+## I am a 14-year-old developer passionate about building secure web solutions.
