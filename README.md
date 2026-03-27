@@ -8,7 +8,7 @@ I developed Sofas king as a high-performance, full-stack e-commerce platform fea
 ### Video:
 > https:www.youtube.comwatch?v=b0VkqCjfRXE
 ### Link website:
-> https:duc-tech-hub.github.ioSofas-king-Demo
+> https://duc-tech-hub.github.io/Sofas-king-Demo
 ### Link dev.to post:
 > https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebase-at-age-14-3mbd
 ---
