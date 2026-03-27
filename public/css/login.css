@@ -69,7 +69,37 @@ h2 {
     margin-bottom: 8px;
     font-size: 28px;
 }
+.forgot-pass-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+.forgot-link {
+    font-size: 0.85rem;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+.forgot-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+    transform: translateY(-1px);
+}
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
 
+.btn-toggle-login {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
 .subtitle {
     text-align: center;
     color: #777;

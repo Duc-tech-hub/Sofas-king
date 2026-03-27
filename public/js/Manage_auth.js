@@ -66,8 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         if (phoneValue) updateData.phoneNumber = phoneValue;
 
                         await setDoc(userDocRef, updateData, { merge: true });
-
-                        // Thông báo thành công
                         await Swal.fire({
                             icon: 'success',
                             title: 'Login Successful',
@@ -94,32 +92,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         confirmButtonColor: '#3498db'
                     });
                 });
-        });
-    }
-
-    // --- LOGOUT SYSTEM ---
-    if (logoutbutton) {
-        logoutbutton.addEventListener("click", async (e) => {
-            const result = await Swal.fire({
-                title: 'Logout?',
-                text: "Are you sure you want to sign out?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, Log out'
-            });
-
-            if (result.isConfirmed) {
-                auth.signOut()
-                    .then(() => {
-                        localStorage.clear();
-                        window.location.replace("index.html");
-                    })
-                    .catch((error) => {
-                        Swal.fire('Error', 'Could not sign out. Please try again.', 'error');
-                    });
-            }
         });
     }
 });

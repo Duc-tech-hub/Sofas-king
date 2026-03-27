@@ -30,13 +30,11 @@ if (imageFileInput) {
 
         const status = document.getElementById('upload-status');
         const preview = document.getElementById('img-preview');
-        
-        // Dùng SWAL để báo đang upload thay vì text thuần
         status.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
         
         const formData = new FormData();
         formData.append("image", file);
-        const API_KEY = "Your_ImageBB_API_KEY"; 
+        const API_KEY = "1e1aed58494ec15fb0cdedabe40a1fa2"; 
 
         try {
             const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {

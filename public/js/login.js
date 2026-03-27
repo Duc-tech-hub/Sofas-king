@@ -1,55 +1,51 @@
 import { auth, db } from "./firebase-config.js";
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const loginForm = document.querySelector("#login-form");
-
-// Toggle ẩn/hiện mật khẩu
 document.querySelector('.btn-toggle-login')?.addEventListener('click', function () {
     const passwordInput = document.getElementById('login-password');
-
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        this.classList.replace('bi-eye-slash', 'bi-eye');
-    } else {
-        passwordInput.type = 'password';
-        this.classList.replace('bi-eye', 'bi-eye-slash');
-    }
+    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('bi-eye');
+    this.classList.toggle('bi-eye-slash');
 });
 
 loginForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const username = document.querySelector("#login-username").value.trim();
+    const emailInput = document.querySelector("#login-username").value.trim();
     const password = document.querySelector("#login-password").value;
     const addressValue = document.querySelector("#address")?.value.trim() || "";
     const phoneValue = document.querySelector("#Phone_number")?.value.trim() || "";
-    const fakeEmail = `${username}@account.com`;
+
     Swal.fire({
-        title: 'Logging in...',
-        text: 'Checking credentials, please wait.',
+        title: 'Authenticating...',
         allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
+        didOpen: () => { Swal.showLoading(); }
     });
 
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, fakeEmail, password);
+        const userCredential = await signInWithEmailAndPassword(auth, emailInput, password);
         const user = userCredential.user;
         const userDocRef = doc(db, "users", user.uid);
-        
-        const updateData = {
-            lastLogin: serverTimestamp()
-        };
-        
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists() && userDoc.data().is_disabled === true) {
+            await signOut(auth);
+            return Swal.fire({
+                icon: 'error',
+                title: 'Account Locked!',
+                text: 'Please contact support.',
+            });
+        }
+        const updateData = { lastLogin: serverTimestamp() };
         if (addressValue) updateData.address = addressValue;
         if (phoneValue) updateData.phoneNumber = phoneValue;
         
         await updateDoc(userDocRef, updateData);
+
         await Swal.fire({
             icon: 'success',
-            title: 'Login successful!',
-            text: `Welcome back, ${username}!`,
+            title: 'Welcome back!',
             timer: 1500,
             showConfirmButton: false
         });
@@ -57,19 +53,10 @@ loginForm?.addEventListener("submit", async (e) => {
         window.location.href = "../html/index.html";
 
     } catch (error) {
-        console.error("Login Error:", error);
-        let errorMsg = "Login failed: " + error.message;
-        if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-            errorMsg = "Invalid username or password!";
-        } else if (error.code === "auth/network-request-failed") {
-            errorMsg = "Network error! Please check your connection.";
-        }
-
-        Swal.fire({
-            icon: 'error',
-            title: 'Login Failed',
-            text: errorMsg,
-            confirmButtonColor: '#e74c3c'
-        });
+        console.error("Login Error:", error.code);
+        let errorMsg = "Invalid email or password!";
+        if (error.code === "auth/user-not-found") errorMsg = "User not found!";
+        
+        Swal.fire({ icon: 'error', title: 'Login Failed', text: errorMsg });
     }
 });

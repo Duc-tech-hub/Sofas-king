@@ -1,9 +1,8 @@
 import { auth, db } from "./firebase-config.js";
 import { 
-    doc, setDoc, collection, addDoc, onSnapshot, getDoc, updateDoc, deleteDoc 
+    doc, setDoc, collection, addDoc, onSnapshot, getDoc, updateDoc 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
 const getCloudCart = async (uid) => {
     const cartRef = doc(db, "carts", uid);
     const snap = await getDoc(cartRef);
@@ -31,7 +30,6 @@ const calculateTotal = async (uid) => {
     }
     return { total, items };
 };
-
 let unsubAdminListener = null; 
 const startListeningAdmin = (uid) => {
     if (unsubAdminListener) unsubAdminListener();
@@ -43,7 +41,6 @@ const startListeningAdmin = (uid) => {
     unsubAdminListener = onSnapshot(statusRef, async (docSnap) => {
         if (!docSnap.exists()) return;
         const data = docSnap.data();
-
         if (data.is_waiting === true && !data.is_confirmed && !data.is_rejected) {
             if (confirmBtn) confirmBtn.style.display = "none";
             if (note) {
@@ -53,11 +50,9 @@ const startListeningAdmin = (uid) => {
             }
             return;
         }
-
         if (data.is_confirmed === true || data.is_rejected === true) {
             await resetCloudCart(uid);
             
-            // Replaced alert with SweetAlert2 for Admin response
             if (data.is_confirmed === true) {
                 await Swal.fire({
                     icon: 'success',
@@ -73,14 +68,12 @@ const startListeningAdmin = (uid) => {
                     confirmButtonColor: '#d33'
                 });
             }
-
             if (confirmBtn) {
                 confirmBtn.style.display = "block";
                 confirmBtn.disabled = false;
                 confirmBtn.innerText = "I have sent money.";
             }
             if (note) note.style.display = "none";
-            
             await updateDoc(statusRef, {
                 is_waiting: false,
                 is_confirmed: false,
@@ -93,7 +86,6 @@ const startListeningAdmin = (uid) => {
         }
     });
 };
-
 const handleConfirmRequest = async (user, totalAmount, items, address) => {
     if (!items || items.length === 0 || !user) return false;
 
@@ -101,10 +93,8 @@ const handleConfirmRequest = async (user, totalAmount, items, address) => {
         let finalName = user.email;
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
-            const userData = userDoc.data();
-            finalName = userData.email || user.email;
+            finalName = userDoc.data().username || userDoc.data().email || user.email;
         }
-
         const pendingCol = collection(db, "history", user.uid, "pending_orders");
         for (const item of items) {
             await addDoc(pendingCol, {
@@ -119,7 +109,6 @@ const handleConfirmRequest = async (user, totalAmount, items, address) => {
                 status: "waiting"
             });
         }
-
         const statusRef = doc(db, "history", user.uid, "admin_verify", "status");
         await setDoc(statusRef, {
             is_waiting: true,
@@ -139,17 +128,16 @@ const handleConfirmRequest = async (user, totalAmount, items, address) => {
         return false;
     }
 };
-
 onAuthStateChanged(auth, async (user) => { 
     if (!user) return;
     
     const addressInput = document.getElementById("address");
     const confirmBtn = document.getElementById("confirmed-sent");
     const userSnap = await getDoc(doc(db, "users", user.uid));
-    
     if (userSnap.exists() && addressInput) {
         addressInput.value = userSnap.data().address || "";
     }
+
     const { total, items } = await calculateTotal(user.uid);
     startListeningAdmin(user.uid);
 
@@ -161,40 +149,43 @@ onAuthStateChanged(auth, async (user) => {
             e.preventDefault();
             const addressValue = addressInput ? addressInput.value.trim() : "";
 
-            // Replaced alert for missing address
             if (!addressValue) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Notice',
-                    text: 'Please enter your delivery address!',
-                });
-                return;
+                return Swal.fire('Notice', 'Please enter your delivery address!', 'warning');
             }
 
-            // Replaced alert for empty cart
             if (total <= 0) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Empty Cart',
-                    text: 'Your Cloud Cart is currently empty!',
-                });
-                return;
+                return Swal.fire('Empty Cart', 'Your Cloud Cart is currently empty!', 'info');
             }
+            Swal.fire({
+                title: 'Sending Request...',
+                text: 'Uploading your order to Cloud Server.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
 
             newConfirmBtn.disabled = true;
-            newConfirmBtn.innerText = "Processing Cloud Data...";
+            newConfirmBtn.innerText = "Processing...";
 
             const success = await handleConfirmRequest(user, total, items, addressValue);
 
-            if (!success) {
+            if (success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Order Created!',
+                    html: `
+                        <p>Your order has been sent to the system.</p>
+                        <p style="font-size: 0.9em; color: #d35400; font-weight: bold;">
+                            If you don't receive a confirmation within 30 minutes, 
+                            please contact the Administrator immediately!
+                        </p>
+                    `,
+                    confirmButtonText: 'I Understand',
+                    confirmButtonColor: '#28a745'
+                });
+            } else {
                 newConfirmBtn.disabled = false;
                 newConfirmBtn.innerText = "I have sent money.";
-                // Replaced alert for submission failure
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Failed to send request. Please try again later.',
-                });
+                Swal.fire('Error', 'Failed to send request. Please try again later.', 'error');
             }
         });
     }

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Setup - Step 2</title>
+    <link rel="stylesheet" href="../css/Register_step2.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div class="security-container">
+        <div class="slim-progress-container">
+            <div class="slim-progress-bar"></div>
+        </div>
+        <p class="step-label">Step 2 of 2: Security Verification</p>
+
+        <form id="security-form" class="security-form">
+            <h2>Security Setup</h2>
+            <p class="subtitle">Set up a recovery question to protect your account access.</p>
+            <div class="input-group-custom">
+                <label for="security-answer">Your email</label>
+                <input type="text" id="security-answer" placeholder="Enter your recovery email" required>
+            </div>
+            <button type="submit" class="btn-complete">Complete Registration</button>
+
+            <div class="security-footer">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>This email is required to login your account when you forgot password.</span>
+            </div>
+        </form>
+    </div>
+
+    <script type="module" src="../js/Register_step2.js"></script>
+</body>
+
+</html>
