@@ -2,7 +2,7 @@ import { auth, db } from "./firebase-config.js";
 import { 
     collection, 
     addDoc, 
-    getDocs, 
+    onSnapshot,
     getDoc, 
     doc, 
     query, 
@@ -26,19 +26,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let hasComments = false;
     const pad = n => n.toString().padStart(2, '0');
-    const fetchComments = async () => {
-        if (error1) error1.textContent = ""; 
-        if (error2) error2.textContent = ""; 
-        if (error3) error3.textContent = "";
-        if (nocom) nocom.textContent = "";
+    const listenToComments = () => {
+        const q = query(collection(db, "comments"), orderBy("date", "desc"));
+        onSnapshot(q, (querySnapshot) => {
+            if (error1) error1.textContent = ""; 
+            if (error2) error2.textContent = ""; 
+            if (error3) error3.textContent = "";
+            if (nocom) nocom.textContent = "";
 
-        commentList.innerHTML = "";
-        
-        try {
-            const q = query(collection(db, "comments"), orderBy("date", "desc"));
-            const querySnapshot = await getDocs(q);
+            commentList.innerHTML = "";
 
             if (querySnapshot.empty) {
+                hasComments = false;
                 if (nocom) nocom.textContent = "There's no comment yet.";
                 combutton?.classList.replace("combutton1", "combutton");
             } else {
@@ -48,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let shown = 0;
                 querySnapshot.forEach(docSnap => {
                     if (shown >= 2) return;
-                    
                     const item = docSnap.data();
                     const d = item.date?.toDate ? item.date.toDate() : new Date();
                     const displayName = item.name || "Anonymous";
@@ -68,10 +66,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     shown++;
                 });
             }
-        } catch (err) {
-            console.error("Lỗi khi load comment:", err);
-        }
+        }, (err) => {
+            console.error("Lỗi lắng nghe comment:", err);
+        });
     };
+
     const checkContentSafe = async (text) => {
         const viBadWordsRegex = /địt|đm|vcl|vkl|đéo|cặc|lồn|buồi|óc chó|ngu lồn|mẹ mày|tổ sư|vãi/i;
         if (viBadWordsRegex.test(text)) return false;
@@ -82,13 +81,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (err) { return true; }
     };
 
-    await fetchComments();
+    // Gọi hàm lắng nghe thay vì fetch 1 lần
+    listenToComments();
+
     if (combutton) {
         combutton.addEventListener("click", (e) => {
             e.preventDefault();
             if (hasComments) window.location.href = "comments.html";
         });
     }
+
     if (form) {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -102,11 +104,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!commentVal) { error3.textContent = "Please write your comment."; return; }
 
             Swal.fire({ title: 'Posting...', didOpen: () => Swal.showLoading() });
+            
             const isSafe = await checkContentSafe(commentVal);
             if (!isSafe) {
                 Swal.fire('Warning', 'Your content contains inappropriate language!', 'error');
                 return;
             }
+
             let nameToSave = "Guest";
             const user = auth.currentUser;
             if (user) {
@@ -121,6 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     nameToSave = "Anonymous";
                 }
             }
+
             try {
                 await addDoc(collection(db, "comments"), {
                     name: nameToSave,
@@ -131,9 +136,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 Swal.fire({ icon: 'success', title: 'Posted!', timer: 2000, showConfirmButton: false });
-
                 form.reset();
-                await fetchComments();
             } catch (err) {
                 Swal.fire('Error', 'Could not post comment.', 'error');
             }

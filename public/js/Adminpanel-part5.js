@@ -34,7 +34,7 @@ if (imageFileInput) {
         
         const formData = new FormData();
         formData.append("image", file);
-        const API_KEY = "1e1aed58494ec15fb0cdedabe40a1fa2"; 
+        const API_KEY = "Your_ImgBB_api_key"; 
 
         try {
             const response = await fetch(`https://api.imgbb.com/1/upload?key=${API_KEY}`, {

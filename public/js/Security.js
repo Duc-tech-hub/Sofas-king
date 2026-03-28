@@ -1,7 +1,9 @@
 import { app, auth, db } from "./firebase-config.js";
-import { getDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; // Thay getDoc bằng onSnapshot
 import { signOut, onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com"];
+
 const handleMagicLinkLogin = async () => {
     if (isSignInWithEmailLink(auth, window.location.href)) {
         let email = window.localStorage.getItem('emailForSignIn');
@@ -28,45 +30,46 @@ const handleMagicLinkLogin = async () => {
         }
     }
 };
+
 const checkSecurity = () => {
     return new Promise((resolve) => {
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             const output = document.querySelector("#inputinfo_username");
             if (user && output) output.textContent = user.email;
 
             if (user) {
-                try {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
+                const userDocRef = doc(db, "users", user.uid);
+                onSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
                         if (userData.is_disabled === true) {
                             await Swal.fire({
                                 icon: 'error',
                                 title: 'Account Locked',
                                 text: 'Your account has been disabled by admin.',
-                                allowOutsideClick: false
+                                allowOutsideClick: false,
+                                confirmButtonText: 'OK'
                             });
+                            
                             await signOut(auth);
                             window.location.replace("../html/403.html");
-                            return resolve(null);
                         }
                     }
-                    const path = window.location.pathname.toLowerCase();
-                    if (path.includes("adminpanel.html") && !ADMIN_EMAILS.includes(user.email)) {
-                        await Swal.fire({ icon: 'warning', title: 'Access Denied', text: 'Admins only!', timer: 2000 });
-                        window.location.replace("../html/403.html");
-                        return resolve(null);
-                    }
-
-                } catch (error) {
-                    console.error("Security Fetch Error:", error);
+                }, (error) => {
+                    console.error("Snapshot Error:", error);
+                });
+                const path = window.location.pathname.toLowerCase();
+                if (path.includes("adminpanel.html") && !ADMIN_EMAILS.includes(user.email)) {
+                    Swal.fire({ icon: 'warning', title: 'Access Denied', text: 'Admins only!', timer: 2000 });
+                    window.location.replace("../html/403.html");
+                    return resolve(null);
                 }
             }
             resolve(user);
         });
     });
 };
+
 (async () => {
     await handleMagicLinkLogin();
 
@@ -74,6 +77,7 @@ const checkSecurity = () => {
     const path = window.location.pathname;
     let fileName = path.split('/').pop().toLowerCase();
     if (fileName === "" || fileName === "/") fileName = "index.html";
+    
     const protectedFiles = [
         "adminpanel.html", "cart.html", "comments.html", 
         "history.html", "pay-form.html", "userinfo.html", "vieworder.html"

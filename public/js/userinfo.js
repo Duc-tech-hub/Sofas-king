@@ -15,6 +15,15 @@ const usernameInp = document.getElementById('inputinfo_username');
 const updateBtn = document.getElementById('update_btn');
 const logoutBtn = document.getElementById('logoutbutton');
 const changePassForm = document.getElementById('change-password-form');
+const checkContentSafe = async (text) => {
+    const viBadWordsRegex = /địt|đm|vcl|vkl|đéo|cặc|lồn|buồi|óc chó|ngu lồn|mẹ mày|tổ sư|vãi/i;
+    if (viBadWordsRegex.test(text)) return false;
+    try {
+        const response = await fetch(`https://www.purgomalum.com/service/containsprofanity?text=${encodeURIComponent(text)}`);
+        const isProfane = await response.text();
+        return isProfane !== "true";
+    } catch (err) { return true; }
+};
 
 let cachedUserData = null;
 onAuthStateChanged(auth, async (user) => {
@@ -45,16 +54,30 @@ onAuthStateChanged(auth, async (user) => {
         window.location.href = "login.html";
     }
 });
+
 updateBtn?.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    updateBtn.innerText = "Saving...";
-    updateBtn.disabled = true;
+    const newUsername = usernameInp.value.trim();
+    if (!newUsername) {
+        return Swal.fire('Warning', 'Username cannot be empty!', 'warning');
+    }
 
+    updateBtn.innerText = "Checking...";
+    updateBtn.disabled = true;
+    const isSafe = await checkContentSafe(newUsername);
+    if (!isSafe) {
+        Swal.fire('Warning', 'Your username contains inappropriate language!', 'error');
+        updateBtn.innerText = "Update Info";
+        updateBtn.disabled = false;
+        return;
+    }
+
+    updateBtn.innerText = "Saving...";
     try {
         const updateData = {
-            username: usernameInp.value.trim(),
+            username: newUsername,
             address: addressInp.value.trim(),
             phoneNumber: phoneInp.value.trim()
         };
@@ -67,6 +90,7 @@ updateBtn?.addEventListener('click', async () => {
         updateBtn.disabled = false;
     }
 });
+
 document.getElementById('link-forgot-pass')?.addEventListener('click', async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
@@ -90,6 +114,7 @@ document.getElementById('link-forgot-pass')?.addEventListener('click', async (e)
         }
     }
 });
+
 changePassForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
@@ -119,6 +144,7 @@ changePassForm?.addEventListener('submit', async (e) => {
         Swal.fire('Error', errorMsg, 'error');
     }
 });
+
 document.querySelectorAll('.toggle-pass').forEach(button => {
     button.addEventListener('click', function() {
         const targetId = this.getAttribute('data-target');
@@ -129,6 +155,7 @@ document.querySelectorAll('.toggle-pass').forEach(button => {
         icon.classList.toggle('bi-eye-slash');
     });
 });
+
 logoutBtn?.addEventListener('click', () => {
     Swal.fire({
         title: 'Log out?',

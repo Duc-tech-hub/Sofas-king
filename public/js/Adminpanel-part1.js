@@ -8,8 +8,6 @@ import {
 
 let isSelectMode = false;
 let users = [];
-
-// Output: show users and their last login, show their status(islocked or not)
 const loadUsersToBox = () => {
     const container = document.querySelector('#output-box-accouts');
     if (!container) return;
@@ -73,8 +71,6 @@ const loadUsersToBox = () => {
         });
     });
 };
-
-// Search account (Submit form)
 document.querySelector('#form-account').addEventListener('submit', (e) => {
     e.preventDefault();
     const keyword = document.querySelector('#search-account').value.toLowerCase().trim();
@@ -89,8 +85,6 @@ document.querySelector('#form-account').addEventListener('submit', (e) => {
         }
     });
 });
-
-// Search account (Realtime input)
 document.querySelector('#search-account').addEventListener('input', (e) => {
     const keyword = e.target.value.toLowerCase().trim();
     const container = document.querySelector('#output-box-accouts');
@@ -104,8 +98,6 @@ document.querySelector('#search-account').addEventListener('input', (e) => {
         }
     });
 });
-
-// Select Mode Toggle
 document.querySelector('#select-account').addEventListener('click', (e) => {
     isSelectMode = !isSelectMode;
     const disableBtn = document.querySelector('#disable-account');
@@ -117,48 +109,77 @@ document.querySelector('#select-account').addEventListener('click', (e) => {
 
     loadUsersToBox();
 });
-
-// Lock accounts
 document.querySelector('#disable-account').addEventListener('click', async () => {
     const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-    if (selectedCheckboxes.length === 0) return alert("You have to choose an account");
+    if (selectedCheckboxes.length === 0) {
+        return Swal.fire({ icon: 'warning', title: 'Selection Required', text: 'You have to choose at least one account!' });
+    }
 
-    if (confirm(`Are you sure you want to lock ${selectedCheckboxes.length} account(s)?`)) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to lock ${selectedCheckboxes.length} account(s).`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, lock them!'
+    });
+
+    if (result.isConfirmed) {
+        Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading() });
         try {
             for (const cb of selectedCheckboxes) {
                 await updateDoc(doc(db, "users", cb.value), { is_disabled: true });
             }
-            alert("Lock successfully");
+            Swal.fire({ icon: 'success', title: 'Locked!', text: 'Accounts have been disabled successfully.', timer: 2000, showConfirmButton: false });
             resetSelectMode();
         } catch (error) {
             console.error("Error disabling:", error);
+            Swal.fire('Error', 'Could not disable accounts.', 'error');
         }
     }
 });
-
-// Unlock accounts
 document.querySelector('#enable-account').addEventListener('click', async () => {
     const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
-    if (selectedCheckboxes.length === 0) return alert("You have to choose an account");
+    if (selectedCheckboxes.length === 0) {
+        return Swal.fire({ icon: 'warning', title: 'Selection Required', text: 'You have to choose at least one account!' });
+    }
 
-    if (confirm(`Unlock ${selectedCheckboxes.length} account(s)?`)) {
+    const result = await Swal.fire({
+        title: 'Unlock accounts?',
+        text: `Enable access for ${selectedCheckboxes.length} account(s)?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, unlock!'
+    });
+
+    if (result.isConfirmed) {
+        Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading() });
         try {
             for (const cb of selectedCheckboxes) {
                 await updateDoc(doc(db, "users", cb.value), { is_disabled: false });
             }
-            alert("Unlock successfully!");
+            Swal.fire({ icon: 'success', title: 'Unlocked!', text: 'Accounts are now active.', timer: 2000, showConfirmButton: false });
             resetSelectMode();
         } catch (error) {
             console.error("Error enabling:", error);
+            Swal.fire('Error', 'Could not unlock accounts.', 'error');
         }
     }
 });
 
 function resetSelectMode() {
     isSelectMode = false;
-    document.querySelector('#select-account').textContent = "Select";
-    document.querySelector('#disable-account').style.display = "none";
-    document.querySelector('#enable-account').style.display = "none";
+    const selectBtn = document.querySelector('#select-account');
+    if (selectBtn) selectBtn.textContent = "Select";
+    
+    const disableBtn = document.querySelector('#disable-account');
+    const enableBtn = document.querySelector('#enable-account');
+    if (disableBtn) disableBtn.style.display = "none";
+    if (enableBtn) enableBtn.style.display = "none";
+    
     loadUsersToBox();
 }
 
