@@ -31,7 +31,7 @@ I effectively leveraged Generative AI (Gemini) as a core part of my development 
 ### Key Features
 
 ### Customer Experience
-* Smart Shopping Cart: Optimized using LocalStorage for sub-millisecond persistence.
+* Smart Shopping Cart: Optimized using firestore cloud.
 * High-quality design: Fully responsive on all devices.
 * Secure Transactional Flow: Multi-step checkout with Google Re-authentication.
 * Order Tracking: Real-time updates via Firestore listeners.
