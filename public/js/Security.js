@@ -1,9 +1,42 @@
 import { app, auth, db } from "./firebase-config.js";
-import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; // Thay getDoc bằng onSnapshot
+import { doc, onSnapshot, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { signOut, onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com"];
+const ADMIN_EMAILS = ["Your_admin_emails"];
+async function updateUserLocation(uid) {
+    try {
+        let city = sessionStorage.getItem('user_city');
+        let country = sessionStorage.getItem('user_country');
 
+        if (!city || !country || city === "Unknown") {
+            try {
+                const response = await fetch('https://geolocation-db.com/json/');
+                const data = await response.json();
+                city = data.city && data.city !== "Not found" ? data.city : "Hanoi (Default)";
+                country = data.country_name || "Vietnam";
+            } catch (err) {
+                console.warn("📍 API 1 tạch, thử API dự phòng...");
+                const res2 = await fetch('https://api.db-ip.com/v2/free/self');
+                const data2 = await res2.json();
+                city = data2.city || "Unknown";
+                country = data2.countryName || "Unknown";
+            }
+
+            sessionStorage.setItem('user_city', city);
+            sessionStorage.setItem('user_country', country);
+        }
+        const userDocRef = doc(db, "users", uid);
+        await updateDoc(userDocRef, {
+            city: city,
+            country: country,
+            lastLogin: serverTimestamp()
+        });
+        console.log(`✅ Sync thành công: ${city}, ${country}`);
+
+    } catch (error) {
+        console.error("📍 Lỗi cuối cùng:", error);
+    }
+}
 const handleMagicLinkLogin = async () => {
     if (isSignInWithEmailLink(auth, window.location.href)) {
         let email = window.localStorage.getItem('emailForSignIn');
@@ -33,11 +66,13 @@ const handleMagicLinkLogin = async () => {
 
 const checkSecurity = () => {
     return new Promise((resolve) => {
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const output = document.querySelector("#inputinfo_username");
             if (user && output) output.textContent = user.email;
 
             if (user) {
+                updateUserLocation(user.uid); 
+
                 const userDocRef = doc(db, "users", user.uid);
                 onSnapshot(userDocRef, async (docSnap) => {
                     if (docSnap.exists()) {
@@ -50,7 +85,6 @@ const checkSecurity = () => {
                                 allowOutsideClick: false,
                                 confirmButtonText: 'OK'
                             });
-                            
                             await signOut(auth);
                             window.location.replace("../html/403.html");
                         }
@@ -58,6 +92,7 @@ const checkSecurity = () => {
                 }, (error) => {
                     console.error("Snapshot Error:", error);
                 });
+
                 const path = window.location.pathname.toLowerCase();
                 if (path.includes("adminpanel.html") && !ADMIN_EMAILS.includes(user.email)) {
                     Swal.fire({ icon: 'warning', title: 'Access Denied', text: 'Admins only!', timer: 2000 });
