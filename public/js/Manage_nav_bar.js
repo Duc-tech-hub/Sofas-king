@@ -2,10 +2,7 @@ import { auth } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 const ADMIN_EMAILS = [
-    "duck.sssop0356@gmail.com", 
-    "sangntp.stommy@mindx.net.vn", 
-    "wormholevn@gmail.com", 
-    "leopowerup@gmail.com"
+    "Your_admin_email"
 ];
 
 onAuthStateChanged(auth, (user) => {

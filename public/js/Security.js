@@ -2,7 +2,7 @@ import { app, auth, db } from "./firebase-config.js";
 import { doc, onSnapshot, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { signOut, onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-const ADMIN_EMAILS = ["duck.sssop0356@gmail.com", "sangntp.stommy@mindx.net.vn", "wormholevn@gmail.com", "leopowerup@gmail.com"];
+const ADMIN_EMAILS = ["Your_admin_email"];
 async function updateUserLocation(uid) {
     try {
         let city = sessionStorage.getItem('user_city');
