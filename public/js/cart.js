@@ -96,7 +96,7 @@ export const renderCart = async () => {
 
         const user = await getAuthState();
         if (!user) {
-            container.innerHTML = '<h1>Your Cart</h1><p class="text-muted">Please login.</p>';
+            container.innerHTML = '<h1 class="mb-4">Your Cart</h1><p class="text-muted">Please login.</p>';
             return;
         }
 
@@ -116,9 +116,7 @@ export const renderCart = async () => {
                 if (productSnap.exists()) {
                     item.Stock = parseInt(productSnap.data().Stock) || 0;
                 }
-            } catch (err) {
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
             return item;
         }));
 
@@ -128,25 +126,31 @@ export const renderCart = async () => {
             const currentQty = parseInt(item.quantity) || 1;
 
             const div = document.createElement("div");
-            div.className = "cart-item-row d-flex justify-content-between border-bottom p-3 mb-2 align-items-center bg-white rounded-3 shadow-sm";
+            // Sử dụng flex-column trên mobile (d-flex d-md-row) để tự xuống dòng
+            div.className = "cart-item-row border-bottom p-3 mb-3 bg-white rounded-3 shadow-sm";
             div.innerHTML = `
-                <div class="d-flex align-items-center gap-3">
-                    <input type="checkbox" class="item-checkbox form-check-input" data-index="${index}" ${isChecked}>
-                    <img src="${item.Image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-                    <div style="min-width: 150px;">
-                        <strong class="d-block">${clean(item.Name)}</strong>
-                        <small class="text-primary fw-bold">${parseFloat(item.Price).toLocaleString()} VND</small>
-                        <br><small class="text-dark fw-medium" style="font-size:0.75rem">Available: ${maxStock}</small>
+                <div class="row align-items-center g-3">
+                    <div class="col-12 col-md-6 d-flex align-items-center gap-3">
+                        <input type="checkbox" class="item-checkbox form-check-input flex-shrink-0" data-index="${index}" ${isChecked}>
+                        <img src="${item.Image}" class="rounded-3" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div class="text-truncate">
+                            <strong class="d-block text-truncate" style="max-width: 200px;">${clean(item.Name)}</strong>
+                            <span class="text-primary fw-bold d-block">${parseFloat(item.Price).toLocaleString()} VND</span>
+                            <small class="text-dark fw-medium">Available: ${maxStock}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="input-group input-group-sm" style="width: 110px;">
-                        <button class="btn btn-outline-secondary qty-btn" data-index="${index}" data-change="-1">-</button>
-                        <input type="text" class="form-control text-center bg-light" value="${currentQty}" readonly>
-                        <button class="btn btn-outline-secondary qty-btn" data-index="${index}" data-change="1" 
-                            ${currentQty >= maxStock ? 'disabled' : ''}>+</button>
+
+                    <div class="col-12 col-md-6 d-flex justify-content-between justify-content-md-end align-items-center gap-3">
+                        <div class="input-group input-group-sm" style="width: 120px;">
+                            <button class="btn btn-outline-secondary qty-btn" data-index="${index}" data-change="-1">-</button>
+                            <input type="text" class="form-control text-center bg-light fw-bold" value="${currentQty}" readonly>
+                            <button class="btn btn-outline-secondary qty-btn" data-index="${index}" data-change="1" 
+                                ${currentQty >= maxStock ? 'disabled' : ''}>+</button>
+                        </div>
+                        <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger delete-btn" data-index="${index}"><i class="bi bi-trash"></i></button>
                 </div>
             `;
             container.appendChild(div);
