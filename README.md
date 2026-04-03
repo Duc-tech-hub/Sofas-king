@@ -85,9 +85,10 @@ Purchase records commit instantly to ensure transparency.
 
 ### Project Structure
 
-* html: 25 pages.
-* js: Security.js, Adminpanel.js, cart.js.
+* html: html files
+* js: js files.
 * css: Custom Bootstrap.
+* img: nessescary image files.
 
 ---
 
