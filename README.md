@@ -6,7 +6,7 @@ I developed Sofas king as a high-performance, full-stack e-commerce platform fea
 
 ### Project Demo
 ### Video:
-> https://www.youtube.com/watch?v=b0VkqCjfRXE
+> https://youtu.be/KDoMIuZI0E4
 ### Link website:
 > https://public-gamma-brown.vercel.app/
 ### Link dev.to post:
