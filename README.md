@@ -1,109 +1,68 @@
-### 🛋️ Sofas King - Premium E-Commerce Solution
-
-I developed Sofas king as a high-performance, full-stack e-commerce platform featuring a modular architecture of 70 files. This project focuses on leveraging Firebase for real-time synchronization and high-speed local persistence to deliver a seamless user experience.
+Below is the updated README in English. I have added a backslash  before Markdown symbols (like #, *, and -) as requested to prevent auto-rendering in your browser.
 
 ---
 
-### Project Demo
-### Video:
-> https://youtu.be/KDoMIuZI0E4
-### Link website:
-> https://public-gamma-brown.vercel.app/
-### Link dev.to post:
-> https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebase-at-age-14-3mbd
----
+# 🛋️ Sofas King - Premium E-Commerce Solution
 
-### AI-Powered Development (AI Collaboration)
-I effectively leveraged Generative AI (Gemini) as a core part of my development workflow to build and refine this project:
+Sofas King is a high-performance, full-stack e-commerce platform built with a modular architecture. The project focuses on maximizing processing speed through Groq AI, securing the ecosystem with Vercel Middleware, and elevating the visual experience with 3D UI components.
 
-* Code Generation: I worked with AI to write and structure complex JavaScript modules and Firebase integration logic.
-* Smart Debugging: I used AI to identify, analyze, and fix critical bugs, especially regarding asynchronous data flows and race conditions.
-* Logic Refactoring: AI helped me optimize Firestore queries and local storage synchronization for better performance.
-* Security Auditing: AI assisted in drafting and testing the Firestore Security Rules to ensure data integrity.
+## 🔗 Project Links
+* *Website:* https://public-gamma-brown.vercel.app/
+* *Demo Video:* https://youtu.be/KDoMIuZI0E4
+* *Technical Post:* Dev.to Article
 
-### Social Good & Community Impact
+## 🚀 Technical Upgrades
 
-* Supporting Local Artisans: I designed this platform to be lightweight and easy to deploy, specifically aiming to help local furniture makers who lack technical resources.
-* Reducing Digital Barriers: By optimizing for high-speed performance and offline resilience, the app remains functional in areas with unstable internet.
-* Promoting Transparent Commerce: Real-time tracking systems foster trust between sellers and buyers.
-* Educational Open-Source: Structured to serve as a learning resource for full-stack development.
+### 1. AI Integration & Content Moderation
+* *Groq AI Engine:* Integrated Groq AI to handle natural language processing with high-speed execution and higher rate limits, ensuring near-instant responses.
+* *Automated Moderation:* Leverages Groq AI to scan and moderate comment content automatically before it reaches the backend, maintaining a healthy community environment.
 
-### Key Features
+### 2. Backend & Middleware Security
+* *Vercel Edge Middleware:* Implemented a middleware layer running on Vercel’s Edge Network to intercept and validate requests before they hit the backend.
+* *Security Layer:* Secured critical operations such as username changes and comment posting via server-side verification.
+* *Custom API Rate Limiting:* Built a robust rate-limiting system for comments, profile updates, and AI requests to prevent spam and DDoS attacks.
+
+### 3. Advanced UI/UX
+* *3D Design Integration:* Upgraded the user interface with 3D design elements, providing a modern, immersive, and tactile feel for furniture products.
+* *Responsive Architecture:* Optimized 3D assets to ensure smooth performance across all devices and screen sizes.
+
+## ✨ Core Features
 
 ### Customer Experience
-* Smart Shopping Cart: Optimized using firestore cloud.
-* High-quality design: Fully responsive on all devices.
-* Secure Transactional Flow: Multi-step checkout with Google Re-authentication.
-* Order Tracking: Real-time updates via Firestore listeners.
+* *Smart Shopping Cart:* Optimized data synchronization using Firestore Cloud.
+* *Secure Transactional Flow:* Multi-step checkout process featuring Google Re-authentication.
+* *Real-time Tracking:* Instant order status updates powered by Firestore listeners.
 
 ### Administrative Control
-* Live Dashboard: Real-time monitoring of orders, users, and comments.
-* Access Management: Instant account locking to mitigate fraud.
-* Business Logic Automation: Automated data migration process.
+* *Live Dashboard:* Real-time monitoring of orders, user activity, and community comments.
+* *Access Management:* Instant account locking capabilities to mitigate fraudulent behavior.
+
+## 🛠️ Technologies Used
+* *Frontend:* HTML5, CSS3, JavaScript (ES6+), 3D Design components.
+* *Backend & Middleware:* Vercel Serverless Functions, Edge Middleware.
+* *AI:* Groq AI Cloud API.
+* *BaaS:* Firebase (Authentication, Firestore).
+* *Security:* API Rate Limiter, Firebase Security Rules.
+
+## 📐 System Architecture & Data Flow
+
+*Client Request:* User interacts with the 3D interface.
+
+*Middleware Validation:* Vercel Middleware checks permissions and Rate Limits.
+
+*AI Processing:* Groq AI validates content integrity (for comments/usernames).
+
+*Database Sync:* The backend confirms the request and commits data to Firestore.
+
+### Flow Logic:
+User Interface (3D) --> Vercel Middleware (Rate Limits) --> Groq AI (Moderation) --> Backend/Firestore
+
+## 📁 Project Structure
+* `html/`: Static page structures.
+* `js/`: Modular logic system (70+ files) integrating Groq APIs and Middleware.
+* `css/`: Custom Bootstrap styling and 3D component CSS.
+* `img/`: Image assets and 3D model resources.
 
 ---
-
-### Technologies Used
-
-* Frontend: HTML5, CSS3, JavaScript.
-* BaaS: Firebase (Auth, Firestore).
-* Security: Firebase Security Rules.
-* Storage: LocalStorage API.
-
----
-
-### System Architecture & Data Flow
-
-### 1. Client-Side Persistence
-Zero lag by capturing interactions in LocalStorage first.
-
-### 2. Event-Driven Real-time Sync
-Admin actions reflect on Client UI instantly via Firestore listeners.
-
-### 3. Instant History Logging
-Transactions record immediately upon purchase for transparency.
-
-graph TD
-subgraph "Client Side"
-A[User] -->|Add| B(LocalStorage)
-B -->|Checkout| C{Auth}
-C -->D[Firestore]
-end
-
-### 🧠 Technical Deep Dive
-
-#### 1. Managing Complexity
-I adopted an ES6 Module architecture to isolate functionality across 70 files.
-
-#### 2. Balancing Real-time vs Efficiency
-Hybrid fetching strategy: onSnapshot for order tracking, and standard fetch for admin tasks.
-
-#### 3. Customer-Centric Data
-Purchase records commit instantly to ensure transparency.
-
----
-
-### Project Structure
-
-* html: html files
-* js: js files.
-* css: Custom Bootstrap.
-* img: nessescary image files.
-
----
-
-### Security Standards & Firebase Rules
-
-1. Data Isolated.
-2. Role-Based Access.
-3. Void State Protocol.
-
----
-
-### 🌟 Community Recognition
-
-* Sandeep Vashishtha (GitHub Star).
-* Rhythm Pahwa (Fullstack Expert).
-
-## Developed by duck.sssop0356@gmail.com
-## I am a 14-year-old developer passionate about building secure web solutions.
+*Developed by:* [duck.sssop0356@gmail.com]
+*I am a 14-year-old developer passionate about building secure and high-performance web solutions.*
