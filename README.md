@@ -54,10 +54,12 @@ Sofas King is a high-performance, full-stack e-commerce platform built with a mo
 User Interface (3D) --> Vercel Middleware (Rate Limits) --> Groq AI (Moderation) --> Backend/Firestore
 
 ## 📁 Project Structure
-* `html/`: Static page structures.
-* `js/`: Modular logic system (70+ files) integrating Groq APIs and Middleware.
-* `css/`: Custom Bootstrap styling and 3D component CSS.
-* `img/`: Image assets and 3D model resources.
+* api: contain backend and middleware security files
+* public: contain frontend files:
+** html/: Static page structures.
+** js/: Modular logic system (70+ files) integrating Groq APIs and Middleware.
+** css/: Custom Bootstrap styling and 3D component CSS.
+** img/: Image assets and 3D model resources.
 
 ---
 *Developed by:* [duck.sssop0356@gmail.com]
