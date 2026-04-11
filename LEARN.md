@@ -1,7 +1,3 @@
-Here are the English versions of your Learning Path and a Dev.to Post, formatted with backslashes \ before Markdown symbols as requested to prevent auto-rendering in your browser.
-
----
-
 ## 🎓 Learning Path: Building Sofas King (Updated)
 
 ### 1. Modular System Architecture & Scalability
