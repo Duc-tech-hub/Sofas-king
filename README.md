@@ -1,7 +1,3 @@
-Below is the updated README in English. I have added a backslash  before Markdown symbols (like #, *, and -) as requested to prevent auto-rendering in your browser.
-
----
-
 # 🛋️ Sofas King - Premium E-Commerce Solution
 
 Sofas King is a high-performance, full-stack e-commerce platform built with a modular architecture. The project focuses on maximizing processing speed through Groq AI, securing the ecosystem with Vercel Middleware, and elevating the visual experience with 3D UI components.
