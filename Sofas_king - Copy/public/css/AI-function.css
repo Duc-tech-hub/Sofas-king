@@ -1,0 +1,144 @@
+.chat-launcher {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    z-index: 9999 !important;
+    width: 65px !important;
+    height: 65px !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+    color: white !important;
+    box-shadow: 0 15px 35px rgba(37, 99, 235, 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    overflow: hidden;
+}
+.chat-launcher::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.chat-launcher:hover::before {
+    left: 100%;
+}
+
+.chat-launcher:hover {
+    transform: scale(1.1) rotate(5deg) !important; /* Hơi xoay nhẹ cho cá tính */
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.4) !important;
+}
+
+.chat-launcher i {
+    font-size: 32px !important;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+#geminiChatModal .modal-content {
+    border-radius: 28px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+#geminiChatModal .modal-header {
+    background: white !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 20px 25px !important;
+}
+
+#geminiChatModal .modal-title {
+    color: #1e293b !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+}
+.message {
+    max-width: 85%;
+    margin-bottom: 18px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.message.user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    color: white !important;
+    border-radius: 20px 20px 4px 20px !important; /* Bo kiểu bong bóng Messenger */
+}
+
+.message.model {
+    align-self: flex-start;
+    background: #f8fafc !important;
+    color: #334155 !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 20px 20px 20px 4px !important;
+}
+.typing-loader {
+    display: flex;
+    gap: 6px;
+    padding: 12px 20px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    width: fit-content;
+    margin-bottom: 15px;
+}
+
+.typing-loader span {
+    width: 8px;
+    height: 8px;
+    background: #cbd5e1;
+    border-radius: 50%;
+    animation: bounce-modern 1.4s infinite ease-in-out;
+}
+
+@keyframes bounce-modern {
+    0%, 100% { transform: translateY(0); opacity: 0.3; }
+    50% { transform: translateY(-8px); opacity: 1; background: #2563eb; }
+}
+.modal-footer {
+    background: white !important;
+    border-top: 1px solid #f1f5f9 !important;
+    padding: 15px !important;
+}
+
+#ai-input {
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 12px 15px !important;
+    transition: 0.3s;
+}
+
+#ai-input:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+}
+body.modal-open .chat-launcher {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: scale(0.5) !important;
+    transition: all 0.3s ease !important;
+}
+@media (max-width: 768px) {
+    #geminiChatModal .modal-dialog {
+        margin: 10px !important;
+        display: flex;
+        align-items: flex-end;
+        min-height: calc(100% - 20px);
+    }
+
+    #geminiChatModal .modal-content {
+        height: 80vh;
+        border-radius: 20px !important;
+    }
+    .modal-body {
+        padding: 10px !important;
+    }
+}
