@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Sofas-king</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/AI-function.css" />
+</head>
+
+<body>
+    <section class="container mx-auto pt-32 pb-20 px-4 md:px-6 min-h-[80vh] flex items-center">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center w-full">
+
+            <div class="header-img-container relative">
+                <div class="absolute -inset-4 bg-blue-100 rounded-[3rem] blur-3xl opacity-40 pointer-events-none"></div>
+
+                <div
+                    class="header-tilt-card relative rounded-[2rem] overflow-hidden shadow-2xl border border-slate-100">
+                    <img id="p-image" src="" class="w-full aspect-square object-cover transition-transform duration-500"
+                        alt="Loading...">
+
+                </div>
+            </div>
+
+            <div class="flex flex-col space-y-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="flex items-center space-x-2 text-sm font-bold text-slate-400 list-none p-0">
+                        <li class="hover:text-blue-600 transition-colors"><a href="index.html"
+                                class="no-underline text-inherit">Home</a></li>
+                        <li><i class="bi bi-chevron-right text-[10px]"></i></li>
+                        <li class="text-blue-600 active" id="p-breadcrumb">Product</li>
+                    </ol>
+                </nav>
+
+                <div class="space-y-2">
+                    <h1 id="p-name" class="text-4xl md:text-5xl font-black text-slate-900 leading-tight">Loading...</h1>
+                    <p class="text-sm font-bold text-slate-400 tracking-wide uppercase">
+                        Product ID: <span id="p-id" class="text-slate-600"></span>
+                        </ol>
+                </div>
+
+                <div class="inline-block">
+                    <h3 id="p-price"
+                        class="text-3xl font-black text-blue-600 bg-blue-50 px-6 py-3 rounded-2xl inline-block">0 VND
+                    </h3>
+                </div>
+
+                <div class="space-y-3">
+                    <h5 class="text-lg font-bold text-slate-800 flex items-center">
+                        <span class="w-6 h-1 bg-blue-600 rounded-full me-2"></span> Description:
+                    </h5>
+                    <p id="p-desc" class="text-base text-slate-500 leading-relaxed max-w-lg">
+                        Please wait while we fetch product details...
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-4 pt-4">
+                    <div class="flex items-center border-2 border-slate-100 rounded-2xl p-1 bg-slate-50">
+                        <input type="number" id="p-quantity"
+                            class="w-16 bg-transparent border-none text-center font-bold text-slate-800 focus:ring-0"
+                            value="1" min="1">
+                    </div>
+
+                    <button id="add-to-cart-btn"
+                        class="flex-1 md:flex-none inline-flex items-center justify-center px-10 h-[60px] bg-slate-900 text-white rounded-2xl font-bold shadow-xl hover:bg-blue-600 hover:-translate-y-1 active:scale-95 transition-all leading-none">
+                        <i class="bi bi-cart-plus me-2 text-xl"></i> Add to Cart
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 text-sm font-bold">
+                    <span class="relative flex h-3 w-3">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="text-slate-500">Stock available: <span id="p-stock"
+                            class="text-green-600">0</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <button aria-label="AI Assistant button" class="btn btn-primary chat-launcher" data-bs-toggle="modal"
+        data-bs-target="#geminiChatModal">
+        <i class="bi bi-robot"></i>
+    </button>
+
+    <div class="modal fade" id="geminiChatModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-stars"></i> Sofas-king AI Assistant
+                    </h5>
+                    <button type="button" class="btn-close btn-close-grey" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body d-flex flex-column" id="chat-content" style="height: 400px; overflow-y: auto;">
+                    <div class="message model p-2 rounded mb-2 bg-light">
+                        Hi, I am your AI assistant. How can I help you with your order?
+                    </div>
+                </div>
+                <div id="quick-suggestions" class="p-2 d-flex flex-wrap gap-2 border-top bg-light">
+                </div>
+
+                <div class="modal-footer p-2 border-top">
+                    <div class="input-group">
+                        <input type="text" id="ai-input" class="form-control border-primary"
+                            placeholder="Ask about sofas...">
+                        <button class="btn btn-primary" type="button" id="ai-send">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../js/AI-function.js"></script>
+    <script type="module" src="../js/ProductDetail.js"></script>
+</body>
+
+</html>
