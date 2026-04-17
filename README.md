@@ -5,7 +5,7 @@ Sofas King is a high-performance, full-stack e-commerce platform built with a mo
 ## 🔗 Project Links
 * *Website:* https://public-gamma-brown.vercel.app/
 * *Demo Video:* https://youtu.be/KDoMIuZI0E4
-* *Technical Post:* Dev.to Article
+* *Technical Post:* https://dev.to/duc_minh_5efc9fed22cc63ea/how-i-built-a-secure-72-module-e-commerce-platform-with-firebase-at-age-14-3mbd
 
 ## 🚀 Technical Upgrades
 
